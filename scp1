@@ -1,0 +1,3 @@
+#!/bin/bash
+
+scp -P 22 $1 lyh543@lyh543.cn:~
