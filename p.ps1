@@ -1,4 +1,4 @@
-Push-Location C:\Tools\git\blog
+Push-Location ~\git\blog
 
 Write-Output "`npushing to lyh543/blog`n"
 

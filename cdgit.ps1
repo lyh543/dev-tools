@@ -1,1 +1,1 @@
-Push-Location C:\Tools\git
+Push-Location ~\git
