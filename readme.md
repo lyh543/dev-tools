@@ -6,10 +6,10 @@
 
 ## Linux/WSL 配置方法
 
-为所有命令添加 `x` 权限：
+加入环境变量即可。以 zsh 为例，将以下内容写入 `.zshrc`：
 
 ```sh
-chmod -R +x dev-tools
+if [ -d "/home/liu/git/dev-tools" ] ; then
+  PATH="$PATH:/home/liu/git/dev-tools"
+fi
 ```
-
-然后加入环境变量。
