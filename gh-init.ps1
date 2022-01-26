@@ -7,5 +7,6 @@ git config --global http.proxy          http://127.0.0.1:17296
 git config --global https.proxy         http://127.0.0.1:17296
 
 git config --global core.editor         "code --wait"
+git config --global core.autocrlf       input
 
 git config --global --list
