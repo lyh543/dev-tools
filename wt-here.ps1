@@ -1,0 +1,1 @@
+wt pwsh -WorkingDirectory $PWD
