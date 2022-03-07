@@ -1,3 +1,3 @@
 Push-Location ~/git/bitme
-python replace.py origin
+python replace.py push
 Pop-Location
