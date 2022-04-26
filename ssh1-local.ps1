@@ -1,1 +1,0 @@
-ssh liu@XiaoXinPro13-Manjaro
