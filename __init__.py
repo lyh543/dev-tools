@@ -28,14 +28,14 @@ def argparse(*argnames: str, rest: Literal['error', 'ignore', 'return'] = 'ignor
     args = sys.argv[1:]
     if len(args) < len(argnames) or (len(args) > len(argnames) and rest == 'error'):
         filename = pathlib.Path(__main__.__file__).name
-        wrapped_argnames = shlex.join(map(lambda x: '<' + x + '>', argnames))
+        wrapped_argnames = ' '.join(map(lambda x: '<' + x + '>', argnames))
         print(f'Usage: {filename} {wrapped_argnames}')
         sys.exit(1)
 
     exact_params = args[:len(argnames)]
     rest_params = args[len(argnames):]
     if rest == 'return':
-        return exact_params + [' '.join(rest_params)]
+        return exact_params + [shlex.join(rest_params)]
     else:
         return exact_params
 
