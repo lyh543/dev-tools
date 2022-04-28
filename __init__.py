@@ -1,6 +1,6 @@
 import re
 
-from __system_specific__ import *
+from lib.system_specific import *
 import __main__
 import pathlib
 from typing import Literal
