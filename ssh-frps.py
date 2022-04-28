@@ -2,5 +2,4 @@
 
 from __init__ import *
 
-print(sys.argv)
-[a, b] = [1,2,3]
+system("ssh lyh543@frps.lyh543.cn -p 22222")

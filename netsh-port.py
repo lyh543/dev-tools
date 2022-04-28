@@ -7,6 +7,10 @@
 # delete excluded portrange: netsh int ipv4 delete excludedportrange protocol=tcp numberofports=100 startport=50000 #
 #####################################################################################################################
 
-netsh interface ipv4 show dynamicport tcp
-netsh interface ipv4 show excludedportrange protocol=tcp
-Get-Content $PSCommandPath
+from __init__ import *
+
+system(
+    f"netsh interface ipv4 show dynamicport tcp",
+    f"netsh interface ipv4 show excludedportrange protocol=tcp",
+    f"type {sys.argv[0]}"
+)
