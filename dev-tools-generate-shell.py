@@ -5,7 +5,7 @@ from __init__ import *
 
 print('generate shell shortcuts for linux...', end='', flush=True)
 if isWindows:
-    raise NotImplementedError()
+    raise NotImplementedError("No need to generate shell in Windows. Just set Python as .py files executor.")
 
 PROJECT_ROOT = MAIN_FILE.parent
 TARGET_DIR = PROJECT_ROOT / 'linux-shortcuts'
