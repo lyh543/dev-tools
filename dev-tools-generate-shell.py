@@ -3,6 +3,7 @@
 import shutil
 from __init__ import *
 
+print('generate shell shortcuts for linux...')
 if isWindows:
     raise NotImplementedError()
 

@@ -13,10 +13,10 @@ POSIX_GIT_POST_MERGE = f"""#!/bin/sh
 {DEV_TOOLS_ROOT}/dev-tools-install-git-repo.py
 {DEV_TOOLS_ROOT}/dev-tools-generate-shell.py
 """
-WINDOWS_GIT_PRE_COMMIT = f"""
+WINDOWS_GIT_PRE_COMMIT = f"""#!/bin/sh
 git update-index --chmod=+x *.py
 """
-WINDOWS_GIT_POST_MERGE = f"""
+WINDOWS_GIT_POST_MERGE = f"""#!/bin/sh
 {DEV_TOOLS_ROOT}/dev-tools-install-git-repo.py
 """
 
