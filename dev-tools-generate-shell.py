@@ -3,7 +3,7 @@
 import shutil
 from __init__ import *
 
-print('generate shell shortcuts for linux...')
+print('generate shell shortcuts for linux...', end='', flush=True)
 if isWindows:
     raise NotImplementedError()
 
@@ -24,6 +24,8 @@ for file in os.listdir(PROJECT_ROOT):
         python {PROJECT_ROOT}/{file} "$@"
         """)
     os.chmod(TARGET_DIR / basename, 0o755)
+
+print('done')
 
 if str(TARGET_DIR) not in os.environ['PATH']:
     print('Detected missing in PATH. Remember to add the following command to .bashrc or .zshrc :')
