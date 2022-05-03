@@ -2,7 +2,7 @@
 
 from __init__ import *
 
-print('install or update git hooks and other configs', end='', flush=True)
+print('install or update git hooks and other configs...', end='', flush=True)
 
 DEV_TOOLS_ROOT = MAIN_FILE.parent
 DEV_TOOLS_GIT_HOOKS = DEV_TOOLS_ROOT / '.git' / 'hooks'
