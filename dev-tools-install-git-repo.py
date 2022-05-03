@@ -13,7 +13,6 @@ git update-index --chmod=+x *.py
 """
 POSIX_GIT_POST_MERGE = f"""#!/bin/sh
 {DEV_TOOLS_ROOT}/dev-tools-install-git-repo.py
-{DEV_TOOLS_ROOT}/dev-tools-generate-shell.py
 """
 WINDOWS_GIT_PRE_COMMIT = f"""#!/bin/sh
 git update-index --chmod=+x *.py
@@ -33,3 +32,6 @@ update_hook('pre-commit', WINDOWS_GIT_PRE_COMMIT if isWindows else POSIX_GIT_PRE
 update_hook('post-merge', WINDOWS_GIT_POST_MERGE if isWindows else POSIX_GIT_POST_MERGE)
 
 print('done')
+
+if not isWindows:
+    system(f'python {DEV_TOOLS_ROOT}/dev-tools-generate-shell.py')

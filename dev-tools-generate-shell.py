@@ -7,13 +7,13 @@ print('generate shell shortcuts for linux...', end='', flush=True)
 if isWindows:
     raise NotImplementedError("No need to generate shell in Windows. Just set Python as .py files executor.")
 
-PROJECT_ROOT = MAIN_FILE.parent
-TARGET_DIR = PROJECT_ROOT / 'linux-shortcuts'
+DEV_TOOLS_ROOT = MAIN_FILE.parent
+TARGET_DIR = DEV_TOOLS_ROOT / 'linux-shortcuts'
 
 shutil.rmtree(TARGET_DIR, ignore_errors=True)
 os.makedirs(TARGET_DIR)
 
-for file in os.listdir(PROJECT_ROOT):
+for file in os.listdir(DEV_TOOLS_ROOT):
     if not re.match("^.*\.py$", file) or re.match("^[_.].*$", file):
         # print("skip " + file)
         continue
@@ -21,7 +21,7 @@ for file in os.listdir(PROJECT_ROOT):
     basename = file[0:-3]
     with open(TARGET_DIR / basename, 'w', encoding='utf-8') as f:
         f.write(f"""#!/bin/sh
-        python {PROJECT_ROOT}/{file} "$@"
+        python {DEV_TOOLS_ROOT}/{file} "$@"
         """)
     os.chmod(TARGET_DIR / basename, 0o755)
 
