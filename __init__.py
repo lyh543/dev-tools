@@ -5,7 +5,7 @@ import __main__
 import pathlib
 from typing import Literal
 
-
+MAIN_FILE = pathlib.Path(__main__.__file__)
 COMMON_FILE_EXTENSIONS = ['py', 'html', 'css', 'js', 'json', 'md', 'ts', 'tsx', 'txt', 'bat', 'sh', 'ps1']
 COMMON_IGNORED_DIRECTORIES = ['node_modules', '.git', '.idea', '.vscode', 'build', 'dist', '__pycache__']
 
@@ -27,7 +27,7 @@ def argparse(*argnames: str, rest: Literal['error', 'ignore', 'return'] = 'ignor
     """
     args = sys.argv[1:]
     if len(args) < len(argnames) or (len(args) > len(argnames) and rest == 'error'):
-        filename = pathlib.Path(__main__.__file__).name
+        filename = MAIN_FILE.name
         wrapped_argnames = ' '.join(map(lambda x: '<' + x + '>', argnames))
         print(f'Usage: {filename} {wrapped_argnames}')
         sys.exit(1)

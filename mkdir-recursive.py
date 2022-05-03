@@ -4,8 +4,10 @@ from __init__ import *
 
 [folder] = argparse("folder", rest="error")
 
-system(
-    f"New-Item {folder} -ItemType Directory"
-    if isWindows
-    else f"mkdir -p {folder}"
-)
+os.makedirs(folder)
+
+# system(
+#     f"New-Item {folder} -ItemType Directory"
+#     if isWindows
+#     else f"mkdir -p {folder}"
+# )

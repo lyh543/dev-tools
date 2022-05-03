@@ -2,5 +2,5 @@
 
 from __init__ import *
 
-system("ssh lyh543@outlook.com@pc.zt.lyh543.cn")
+system("ssh lyh543@outlook.com@pc.local.lyh543.cn")
 
