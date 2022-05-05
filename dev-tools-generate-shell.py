@@ -19,6 +19,10 @@ for file in os.listdir(DEV_TOOLS_ROOT):
         continue
 
     basename = file[0:-3]
+    if system('which ' + basename + redirect_stdout_to_null + redirect_stderr_to_null, exit_on_errors=False) == 0:
+        # print(file + "command already exists, skip")
+        continue
+
     with open(TARGET_DIR / basename, 'w', encoding='utf-8') as f:
         f.write(f"""#!/bin/sh
         python {DEV_TOOLS_ROOT}/{file} "$@"

@@ -7,4 +7,4 @@ from __init__ import *
 if isWindows:
     system("wsl ls -lh " + rest)
 else:
-    system("wsl ls -lh " + rest)
+    system("ls -lh " + rest)
