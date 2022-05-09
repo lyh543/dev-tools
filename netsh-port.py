@@ -5,6 +5,7 @@
 #   list excluded portrange: netsh int ipv4 show excludedportrange protocol=tcp                                     #
 #    add excluded portrange: netsh int ipv4 add excludedportrange protocol=tcp numberofports=100 startport=50000    #
 # delete excluded portrange: netsh int ipv4 delete excludedportrange protocol=tcp numberofports=100 startport=50000 #
+#                 RECOMMEND: netsh int ipv4 set dynamicport tcp start=40000 num=10000                               #
 #####################################################################################################################
 
 from __init__ import *

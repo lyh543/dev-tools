@@ -2,14 +2,7 @@
 
 from __init__ import *
 
-def replace_pattern(file: str, old: str, new: str) -> int:
-    """
-    replace patterns in a file
-    :param file: file path
-    :param old: old string
-    :param new: new string
-    :return: if any pattern is replaced, return 1, otherwise return 0
-    """
+def replace_utf8(file: str) -> int:
     encodings = ['utf-8', 'gbk', 'gb2312', 'utf-16', 'utf-32']
     encoding = None
     for enc in encodings:
@@ -23,15 +16,13 @@ def replace_pattern(file: str, old: str, new: str) -> int:
     if encoding is None:
         print(f'{file} is not encoded in {encodings}')
         return 0
-
-    if old in content:
-        content = content.replace(old, new)
-        with open(file, 'w',newline='\n', encoding=encoding) as f:
-            f.write(content)
-            print('replace pattern in ' + file)
-        return 1
+    
+    if encoding == 'utf-8':
+        print(f'{file} is already utf-8')
     else:
-        return 0
+        print(f'{file}: convert {encoding} to utf-8')
+        with open(file, 'w',newline='\n', encoding='utf-8') as f:
+            f.write(content)
 
 file_extensions = COMMON_FILE_EXTENSIONS
 file_patterns = list(map(lambda ext: re.compile(f'\.{ext}$'), file_extensions))
@@ -40,4 +31,4 @@ ignored_directory = COMMON_IGNORED_DIRECTORIES
 [folder] = argparse("folder", rest="error")
 file_list = traverse(folder, file_patterns, ignored_directory)
 for file in file_list:
-    replace_pattern(file, '\r\n', '\n')
+    replace_utf8(file)
