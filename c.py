@@ -1,3 +1,10 @@
 #!/usr/bin/env python3
-from importlib import import_module
-import_module("git-commit")
+
+from __init__ import *
+
+[msg, rest] = argparse("msg", rest="return")
+
+system(
+    f"git add --all",
+    f'git commit -m "{msg}" {rest}'
+)
