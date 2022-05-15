@@ -4,5 +4,5 @@ from __init__ import *
 
 # https://docs.docker.com/engine/reference/commandline/ps/#formatting
 system(
-    'docker ps --format "table {{.ID}}\t{{.Image}}\t{{.CreatedAt}}\t{{.Status}}\t{{.Size}}\t{{.Names}}"',
+    'docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Size}}\t{{.Names}}"',
 )
