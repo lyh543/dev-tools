@@ -2,6 +2,7 @@
 
 from __init__ import *
 
+
 def replace_utf8(file: str) -> int:
     encodings = ['utf-8', 'gbk', 'gb2312', 'utf-16', 'utf-32']
     encoding = None
@@ -24,7 +25,8 @@ def replace_utf8(file: str) -> int:
         with open(file, 'w',newline='\n', encoding='utf-8') as f:
             f.write(content)
 
-file_extensions = COMMON_FILE_EXTENSIONS
+
+file_extensions = TEXT_FILE_EXTENSIONS
 file_patterns = list(map(lambda ext: re.compile(f'\.{ext}$'), file_extensions))
 ignored_directory = COMMON_IGNORED_DIRECTORIES
 

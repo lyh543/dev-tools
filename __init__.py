@@ -3,10 +3,13 @@ import re
 from lib.system_specific import *
 import __main__
 import pathlib
-from typing import Literal
+from typing import Literal, Callable
 
 MAIN_FILE = pathlib.Path(__main__.__file__)
-COMMON_FILE_EXTENSIONS = ['py', 'html', 'css', 'js', 'json', 'md', 'ts', 'tsx', 'txt', 'bat', 'sh', 'ps1']
+TEXT_FILE_EXTENSIONS = ['py', 'html', 'css', 'js', 'json', 'md', 'ts', 'tsx', 'txt', 'bat', 'sh', 'ps1']
+VIDEO_FILE_EXTENSIONS = ['mp4', 'avi', 'mkv', 'mov', 'm4v', 'webm', 'wmv', 'flv', 'vob', 'ogv', 'ogg' 'mpg', 'mpeg',
+                         'm2v', 'm4p', 'm4v', 'mp4v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a',
+                         'f4b']
 COMMON_IGNORED_DIRECTORIES = ['node_modules', '.git', '.idea', '.vscode', 'build', 'dist', '__pycache__']
 
 
@@ -41,8 +44,8 @@ def argparse(*argnames: str, rest: Literal['error', 'ignore', 'return'] = 'ignor
 
 
 def traverse(dir_path: str,
-             file_patterns: list[str | re.Pattern] = None,
-             ignored_directories: list[str | re.Pattern] = None) -> list:
+             file_patterns: Callable[[str], bool] = lambda x: True,
+             ignored_directories: Callable[[str], bool] = lambda x: True) -> list:
     """
     traverse a directory and return a list of files (folders are excluded)
     """

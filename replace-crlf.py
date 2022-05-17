@@ -2,6 +2,7 @@
 
 from __init__ import *
 
+
 def replace_pattern(file: str, old: str, new: str) -> int:
     """
     replace patterns in a file
@@ -33,7 +34,7 @@ def replace_pattern(file: str, old: str, new: str) -> int:
     else:
         return 0
 
-file_extensions = COMMON_FILE_EXTENSIONS
+file_extensions = TEXT_FILE_EXTENSIONS
 file_patterns = list(map(lambda ext: re.compile(f'\.{ext}$'), file_extensions))
 ignored_directory = COMMON_IGNORED_DIRECTORIES
 
