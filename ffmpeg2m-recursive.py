@@ -4,7 +4,7 @@ from __init__ import *
 from ffmpeg2m import ffmpeg2m
 
 
-def ffmpeg2m_recursive(path = "."):
+def ffmpeg2m_recursive(path="."):
     """
     :param path: directory path
     :return: if is exited by Ctrl+C, clean unfinished output and return 255
