@@ -2,7 +2,8 @@
 
 from __init__ import *
 
-print('install or update git hooks and other configs...', end='', flush=True)
+# todo: add a decorator to log
+print('install/update git hooks and other configs...', end='', flush=True)
 
 # config dir
 DEV_TOOLS_ROOT = MAIN_FILE.parent

@@ -23,7 +23,7 @@ def ffmpeg2m(input: str, output: str, overwrite: Optional[bool] = None):
                # -vf scale=-1:720 \ 
                f"-c:v hevc_nvenc "
                f'"{output}"')
-    print('\n\n>>>', command)
+    print('>>>', command)
     # catch ctrl+c
     try:
         value = system(command, exit_on_errors=False)
