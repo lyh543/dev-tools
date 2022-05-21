@@ -9,7 +9,9 @@ def ffmpeg2m_recursive(path="."):
     :param path: directory path
     :return: if is exited by Ctrl+C, clean unfinished output and return 255
     """
-    file_list = traverse(path, VIDEO_FILE_EXTENSIONS, COMMON_IGNORED_DIRECTORIES)
+    file_list = traverse(path,
+                         filename_filter=extension_allow_filter(VIDEO_FILE_EXTENSIONS),
+                         dirname_filter=filename_block_filter(COMMON_IGNORED_DIRECTORIES))
     filtered_file_list = list(filter(lambda f: f.split('.')[-2] != 'compressed', file_list))
     output_list = list(map(lambda f: '.'.join(f.split('.')[:-1]) + '.compressed.mp4', filtered_file_list))
 

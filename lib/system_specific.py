@@ -26,6 +26,7 @@ def run_shell(command: str) -> int:
     return os.system(command)
 
 
+# run command
 def system(*commands: str,
            exit_on_errors=True,
            run_pwsh_on_win=False,
@@ -43,3 +44,7 @@ def system(*commands: str,
         exit(exit_code)
     return exit_code
 
+
+# start a shell, usually after changing directory in Python
+def start_shell() -> int:
+    return os.system('pwsh || powershell || cmd') if isWindows else os.system('$SHELL')

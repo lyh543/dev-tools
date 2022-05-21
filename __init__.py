@@ -1,16 +1,12 @@
 import re
+from typing import Literal
 
 from lib.system_specific import *
+from lib.file_filter import *
 import __main__
 import pathlib
-from typing import Literal, Callable
 
 MAIN_FILE = pathlib.Path(__main__.__file__)
-TEXT_FILE_EXTENSIONS = ['py', 'html', 'css', 'js', 'json', 'md', 'ts', 'tsx', 'txt', 'bat', 'sh', 'ps1']
-VIDEO_FILE_EXTENSIONS = ['mp4', 'avi', 'mkv', 'mov', 'm4v', 'webm', 'wmv', 'flv', 'vob', 'ogv', 'ogg' 'mpg', 'mpeg',
-                         'm2v', 'm4p', 'm4v', 'mp4v', 'svi', '3gp', '3g2', 'mxf', 'roq', 'nsv', 'f4v', 'f4p', 'f4a',
-                         'f4b']
-COMMON_IGNORED_DIRECTORIES = ['node_modules', '.git', '.idea', '.vscode', 'build', 'dist', '__pycache__']
 
 
 def expand_path(path: str) -> str:
@@ -44,25 +40,21 @@ def argparse(*argnames: str, rest: Literal['error', 'ignore', 'return'] = 'ignor
 
 
 def traverse(dir_path: str,
-             file_patterns: Callable[[str], bool] = lambda x: True,
-             ignored_directories: Callable[[str], bool] = lambda x: True) -> list:
+             filename_filter: FileFilter = no_filter,
+             dirname_filter: FileFilter = no_filter) -> list:
     """
-    traverse a directory and return a list of files (folders are excluded)
+    traverse a directory and return a list of files
+    will only traverse dirs that dirname_filter(dirname, dirpath) == True
+    will only return files that filename_filter(filename, filepath) == True
     """
-    if file_patterns is None:
-        file_patterns = []
-    if ignored_directories is None:
-        ignored_directories = []
     total = []
     filenames = os.listdir(dir_path)
     for filename in filenames:
-        full_path = os.path.join(dir_path, filename)
-        if os.path.isdir(full_path):
+        filepath = os.path.join(dir_path, filename)
+        if os.path.isdir(filepath) and dirname_filter(filename, filepath):
             # is a directory and not ignored
-            if not any(map(lambda x: re.search(x, filename), ignored_directories)):
-                total += traverse(full_path, file_patterns, ignored_directories)
+            total += traverse(filepath, filename_filter, dirname_filter)
         else:
-            # is a file and matched the pattern
-            if any(map(lambda x: re.search(x, filename), file_patterns)):
-                total.append(full_path)
+            if filename_filter(filename, filepath):
+                total.append(filepath)
     return total

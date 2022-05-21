@@ -15,7 +15,7 @@ def replace_pattern(file: str, old: str, new: str) -> int:
     encoding = None
     for enc in encodings:
         try:
-            with open(file, 'r',newline='\n', encoding=enc) as f:
+            with open(file, 'r', newline='\n', encoding=enc) as f:
                 content = f.read()
                 encoding = enc
                 break
@@ -27,18 +27,17 @@ def replace_pattern(file: str, old: str, new: str) -> int:
 
     if old in content:
         content = content.replace(old, new)
-        with open(file, 'w',newline='\n', encoding=encoding) as f:
+        with open(file, 'w', newline='\n', encoding=encoding) as f:
             f.write(content)
             print('replace pattern in ' + file)
         return 1
     else:
         return 0
 
-file_extensions = TEXT_FILE_EXTENSIONS
-file_patterns = list(map(lambda ext: re.compile(f'\.{ext}$'), file_extensions))
-ignored_directory = COMMON_IGNORED_DIRECTORIES
 
 [folder] = argparse("folder", rest="error")
-file_list = traverse(folder, file_patterns, ignored_directory)
+file_list = traverse(folder,
+                     filename_filter=extension_allow_filter(TEXT_FILE_EXTENSIONS),
+                     dirname_filter=filename_block_filter(COMMON_IGNORED_DIRECTORIES))
 for file in file_list:
     replace_pattern(file, '\r\n', '\n')
