@@ -4,7 +4,4 @@ from __init__ import *
 
 [rest] = argparse(rest="return")
 
-if isWindows:
-    system("wsl ls -lh " + rest)
-else:
-    system("ls -lh " + rest)
+system("exa  --icons -lh " + rest)
