@@ -4,5 +4,5 @@ from __init__ import *
 
 system(
     "DISM /Online /Cleanup-Image /ScanHealth",
-    "DISM /Online /Cleanup-Image /RestoreHealth"
+    "DISM /Online /Cleanup-Image /RestoreHealth",
 )

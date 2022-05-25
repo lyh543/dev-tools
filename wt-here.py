@@ -3,5 +3,3 @@
 from __init__ import *
 
 system("wt pwsh -WorkingDirectory %cd%")
-
-

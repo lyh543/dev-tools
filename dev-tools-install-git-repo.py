@@ -6,7 +6,7 @@ from lib.log import *
 # config dir
 DEV_TOOLS_ROOT = MAIN_FILE.parent
 DEV_TOOLS_ROOT_POSIX = DEV_TOOLS_ROOT.as_posix()
-DEV_TOOLS_GIT_HOOKS = DEV_TOOLS_ROOT / '.git' / 'hooks'
+DEV_TOOLS_GIT_HOOKS = DEV_TOOLS_ROOT / ".git" / "hooks"
 
 # commands to be run in the hook
 POSIX_GIT_PRE_COMMIT = f"""#!/bin/sh
@@ -33,18 +33,22 @@ python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
 
-@git_hooks_logging('install/update git hooks')
+@git_hooks_logging("install/update git hooks")
 def update_git_hooks():
     def update_hook(name: str, content: str):
-        with open(DEV_TOOLS_GIT_HOOKS / name, 'w', encoding='utf-8') as f:
+        with open(DEV_TOOLS_GIT_HOOKS / name, "w", encoding="utf-8") as f:
             f.write(content)
         os.chmod(DEV_TOOLS_GIT_HOOKS / name, 0o755)
 
-    update_hook('pre-commit', WINDOWS_GIT_PRE_COMMIT if isWindows else POSIX_GIT_PRE_COMMIT)
-    update_hook('post-merge', WINDOWS_GIT_POST_MERGE if isWindows else POSIX_GIT_POST_MERGE)
+    update_hook(
+        "pre-commit", WINDOWS_GIT_PRE_COMMIT if isWindows else POSIX_GIT_PRE_COMMIT
+    )
+    update_hook(
+        "post-merge", WINDOWS_GIT_POST_MERGE if isWindows else POSIX_GIT_POST_MERGE
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     update_git_hooks()
     if not isWindows:
-        system(f'python {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py')
+        system(f"python {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py")

@@ -13,5 +13,5 @@ from __init__ import *
 system(
     f"netsh interface ipv4 show dynamicport tcp",
     f"netsh interface ipv4 show excludedportrange protocol=tcp",
-    f"type {sys.argv[0]}"
+    f"type {sys.argv[0]}",
 )

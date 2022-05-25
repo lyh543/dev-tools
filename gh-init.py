@@ -11,10 +11,8 @@ system(
     'git config --global init.defaultbranch              "master"',
     'git config --global http.proxy                      "http://127.0.0.1:17296"',
     'git config --global https.proxy                     "http://127.0.0.1:17296"',
-
     'git config --global core.editor                     "code --wait"',
     'git config --global core.autocrlf                   "input"',
-
     'git config --file $HOME/.bitme.gitconfig user.email       "yan.lyh@bitme.fun"',
     'git config --file $HOME/.bitme.gitconfig user.name        "Yanhui Liu"',
     run_pwsh_on_win=True,

@@ -9,8 +9,13 @@ TARGET_DIR = DEV_TOOLS_ROOT / "shell"
 
 
 def generate_shell_windows(basename: str):
-    if (system("where.exe " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
-               exit_on_errors=False, ) == 0):
+    if (
+        system(
+            "where.exe " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
+            exit_on_errors=False,
+        )
+        == 0
+    ):
         print(basename + " command already exists, skip")
         return
     with open(TARGET_DIR / (basename + ".cmd"), "w", encoding="utf-8") as f:
@@ -18,14 +23,18 @@ def generate_shell_windows(basename: str):
 
 
 def generate_shell_linux(basename: str):
-    if (system("which " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
-               exit_on_errors=False, ) == 0):
+    if (
+        system(
+            "which " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
+            exit_on_errors=False,
+        )
+        == 0
+    ):
         print(basename + " command already exists, skip")
         return
     with open(TARGET_DIR / basename, "w", encoding="utf-8") as f:
         f.write(
-            f"""#!/bin/sh \n""" +
-            f"""python {DEV_TOOLS_ROOT}/{basename}.py "$@" """
+            f"""#!/bin/sh \n""" + f"""python {DEV_TOOLS_ROOT}/{basename}.py "$@" """
         )
     os.chmod(TARGET_DIR / basename, 0o755)
 
