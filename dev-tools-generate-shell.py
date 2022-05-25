@@ -39,7 +39,7 @@ def generate_shell_linux(basename: str):
     os.chmod(TARGET_DIR / basename, 0o755)
 
 
-@git_hooks_logging("generate shell shortcuts for linux")
+@git_hooks_logging("generate shell shortcuts")
 def generate_shell():
     shutil.rmtree(TARGET_DIR, ignore_errors=True)
     os.makedirs(TARGET_DIR)

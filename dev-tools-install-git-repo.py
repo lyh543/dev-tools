@@ -50,5 +50,4 @@ def update_git_hooks():
 
 if __name__ == "__main__":
     update_git_hooks()
-    if not isWindows:
-        system(f"python {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py")
+    system(f"python {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py")
