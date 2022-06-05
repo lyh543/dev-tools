@@ -32,10 +32,12 @@ python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 
 POSIX_GIT_POST_MERGE = f"""#!/bin/sh
 {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
+pip install -r {DEV_TOOLS_ROOT_POSIX}/requirements.txt
 """
 
 WINDOWS_GIT_POST_MERGE = f"""#!/bin/sh
 python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
+pip install -r {DEV_TOOLS_ROOT_POSIX}/requirements.txt
 """
 
 
