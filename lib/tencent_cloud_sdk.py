@@ -8,6 +8,8 @@ from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.dnspod.v20210323 import dnspod_client
 from tencentcloud.dnspod.v20210323.dnspod_client import DnspodClient
 
+del os.environ["HTTP_PROXY"]
+del os.environ["HTTPS_PROXY"]
 os.environ["NO_PROXY"] = "*"
 
 with open(Path(("~/.tccli/default.credential")).expanduser(), "r") as f:

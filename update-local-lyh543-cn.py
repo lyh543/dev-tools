@@ -9,11 +9,13 @@ from lib.tencent_cloud_sdk import create_dnspod_client
 
 
 def get_local_ip() -> str:
-    ips = socket.gethostbyname_ex(socket.gethostname())[2]
-    local_ips = list(filter(lambda ip: ip.startswith("192.168"), ips))
-    if len(local_ips) != 1:
-        raise Exception(f"local ip is not unique: {local_ips}")
-    return local_ips[0]
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 53))
+    local_ip = s.getsockname()[0]
+    s.close()
+    if not local_ip.startswith("192.168."):
+        raise Exception("local ip is not 192.168.*")
+    return local_ip
 
 
 def update_local_lyh543_cn(domain: str, subdomain: str, ip: str):
