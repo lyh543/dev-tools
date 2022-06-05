@@ -10,6 +10,9 @@ DEV_TOOLS_GIT_HOOKS = DEV_TOOLS_ROOT / ".git" / "hooks"
 
 # commands to be run in the hook
 POSIX_GIT_PRE_COMMIT = f"""#!/bin/sh
+{git_hooks_logging_cmd_started('linting **/*.py')}
+black {DEV_TOOLS_ROOT_POSIX}/**/*.py
+{git_hooks_logging_cmd_done('linting **/*.py')}
 {git_hooks_logging_cmd_started('add execute permission to *.py')}
 chmod a+x *.py
 git update-index --chmod=+x *.py
@@ -17,15 +20,18 @@ git update-index --chmod=+x *.py
 {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
-POSIX_GIT_POST_MERGE = f"""#!/bin/sh
-{DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
-"""
-
 WINDOWS_GIT_PRE_COMMIT = f"""#!/bin/sh
+{git_hooks_logging_cmd_started('linting **/*.py')}
+black {DEV_TOOLS_ROOT_POSIX}/\*\*/*.py
+{git_hooks_logging_cmd_done('linting **/*.py')}
 {git_hooks_logging_cmd_started('add execute permission to *.py')}
 git update-index --chmod=+x *.py
 {git_hooks_logging_cmd_done('add execute permission to *.py')}
 python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
+"""
+
+POSIX_GIT_POST_MERGE = f"""#!/bin/sh
+{DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
 WINDOWS_GIT_POST_MERGE = f"""#!/bin/sh

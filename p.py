@@ -6,10 +6,10 @@ from datetime import datetime
 print("\npushing to lyh543/blog\n")
 
 system(
-    "pushd ~/git/blog/" + redirect_stdout_to_null,
+    "pushd ~/git/blog/" + REDIRECT_STDOUT_TO_NULL,
     "git add --all",
     f"git commit -m 'blog: update on {datetime.now()}'",
     "git push origin master",
-    "popd" + redirect_stdout_to_null,
+    "popd" + REDIRECT_STDOUT_TO_NULL,
     run_pwsh_on_win=True,
 )

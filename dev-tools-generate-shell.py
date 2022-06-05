@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import shutil
+import re
+
 from __init__ import *
 from lib.log import git_hooks_logging
 
@@ -9,13 +11,7 @@ TARGET_DIR = DEV_TOOLS_ROOT / "shell"
 
 
 def generate_shell_windows(basename: str):
-    if (
-        system(
-            "where.exe " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
-            exit_on_errors=False,
-        )
-        == 0
-    ):
+    if check_command_exist(basename):
         print(basename + " command already exists, skip")
         return
     with open(TARGET_DIR / (basename + ".cmd"), "w", encoding="utf-8") as f:
@@ -23,13 +19,7 @@ def generate_shell_windows(basename: str):
 
 
 def generate_shell_linux(basename: str):
-    if (
-        system(
-            "which " + basename + redirect_stdout_to_null + redirect_stderr_to_null,
-            exit_on_errors=False,
-        )
-        == 0
-    ):
+    if check_command_exist(basename):
         print(basename + " command already exists, skip")
         return
     with open(TARGET_DIR / basename, "w", encoding="utf-8") as f:

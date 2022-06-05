@@ -11,4 +11,4 @@ if isWindows:
             run_pwsh_on_win=True,
         )
 else:
-    system("rm -rf {shlex.join(files)}")
+    system(f"rm -rf {shlex.join(files)}")
