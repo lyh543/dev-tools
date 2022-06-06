@@ -89,7 +89,9 @@ class FFmpeg:
         video_bitrate_option = cls._get_bitrate_option("video", video_bitrate)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
         scale_filter = cls._get_video_filter_scale(resolution)
-        video_filter_option = cls._get_video_filter_options([scale_filter, *hw_extra_filters])
+        video_filter_option = cls._get_video_filter_options(
+            [scale_filter, *hw_extra_filters]
+        )
         output_option = cls._get_output_option(output)
         return " ".join(
             [
@@ -117,7 +119,9 @@ class FFmpeg:
         elif overwrite == "ask":
             return ""
         else:
-            raise ValueError(f"overwrite param: expected 'always', 'never' or 'ask', got {overwrite}")
+            raise ValueError(
+                f"overwrite param: expected 'always', 'never' or 'ask', got {overwrite}"
+            )
 
     @classmethod
     def detect_gpu(cls) -> GpuOptions:
@@ -134,7 +138,9 @@ class FFmpeg:
         return cls._gpu
 
     @classmethod
-    def _get_hwaccel_and_encoder_and_extra_filters(cls, use_gpu: bool) -> (str, str, List[str]):
+    def _get_hwaccel_and_encoder_and_extra_filters(
+        cls, use_gpu: bool
+    ) -> (str, str, List[str]):
         if not use_gpu:
             return "", "", []
         GPU = cls.detect_gpu()
