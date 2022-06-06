@@ -25,7 +25,8 @@ VIDEO_FILE_EXTENSIONS = [
     "flv",
     "vob",
     "ogv",
-    "ogg" "mpg",
+    "ogg",
+    "mpg",
     "mpeg",
     "m2v",
     "m4p",
@@ -69,14 +70,14 @@ def filename_allow_filter(allowlist: List[str]) -> FileFilter:
 
 def filename_block_filter(blocklist: List[str]) -> FileFilter:
     def _filter(filename: str, filepath: str) -> bool:
-        return filename not in blocklist
+        return filename.lower() not in blocklist
 
     return _filter
 
 
 def extension_allow_filter(allowlist: List[str]) -> FileFilter:
     def _filter(filename: str, filepath: str) -> bool:
-        return filename.split(".")[-1] in allowlist
+        return filename.split(".")[-1].lower() in allowlist
 
     return _filter
 

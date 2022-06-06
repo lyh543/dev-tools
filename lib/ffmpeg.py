@@ -1,25 +1,17 @@
 from time import sleep
-from typing import List
+from typing import List, Literal
 
 from .system_specific import *
 
-# detect GPU
-if check_command_exist("nvidia-smi"):
-    print("detected Nvidia GPU")
-    GPU = "nvidia"
-elif check_command_exist("radeontop"):
-    # working on Linux, not working on Windows
-    print("detected AMD GPU")
-    GPU = "amd"
-else:
-    print("no GPU detected")
-    GPU = None
+OverwriteOptions = Literal["always", "never", "ask"]
+GpuOptions = Literal["nvidia", "amd", "no_gpu", None]
 
 
 def ffmpeg(
     input: str,
     output: str,
-    overwrite: bool = None,
+    use_gpu: bool = True,
+    overwrite: OverwriteOptions = "ask",
     video_bitrate: str = None,
     audio_bitrate: str = None,
     resolution: [int, int] = None,
@@ -29,14 +21,17 @@ def ffmpeg(
 
     :param input: input file path e.g. "input.mov"
     :param output: output file path e.g. "output.mp4"
-    :param overwrite: True=always overwrite, False=never overwrite, None=always ask
+    :param use_gpu: True=use GPU if exists, False=use CPU
+    :param overwrite: "always" "never" "ask"
     :param video_bitrate: e.g. "2M" for 2Mbps
+    :param audio_bitrate: e.g. "128K" for 128Kbps
     :param resolution: [width, height] e.g. [-1, 720] for auto:720p
     :return: command to run
     """
     command = FFmpeg.ffmpeg_command(
         input=input,
         output=output,
+        use_gpu=use_gpu,
         overwrite=overwrite,
         video_bitrate=video_bitrate,
         audio_bitrate=audio_bitrate,
@@ -60,12 +55,15 @@ def ffmpeg(
 
 
 class FFmpeg:
+    _gpu: GpuOptions = None
+
     @classmethod
     def ffmpeg_command(
         cls,
         input: str,
         output: str,
-        overwrite: bool = None,
+        use_gpu: bool = True,
+        overwrite: OverwriteOptions = "ask",
         video_bitrate: str = None,
         audio_bitrate: str = None,
         resolution: [int, int] = None,
@@ -75,25 +73,23 @@ class FFmpeg:
 
         :param input: input file path e.g. "input.mov"
         :param output: output file path e.g. "output.mp4"
-        :param overwrite: True=always overwrite, False=never overwrite, None=always ask
+        :param use_gpu: True=use GPU if exists, False=use CPU
+        :param overwrite: "always" "never" "ask"
         :param video_bitrate: e.g. "2M" for 2Mbps
         :param audio_bitrate: e.g. "128K" for 128Kbps
         :param resolution: [width, height] e.g. [-1, 720] for auto:720p
-        :return: exit code. if is exited by Ctrl+C, clean unfinished job and return 255
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         [
             hwaccel_option,
             video_encoder_option,
             hw_extra_filters,
-        ] = cls._get_hwaccel_and_encoder_and_extra_filters()
+        ] = cls._get_hwaccel_and_encoder_and_extra_filters(use_gpu)
         input_option = cls._get_input_option(input)
         video_bitrate_option = cls._get_bitrate_option("video", video_bitrate)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
         scale_filter = cls._get_video_filter_scale(resolution)
-        video_filter_option = cls._get_video_filter_options(
-            [scale_filter, *hw_extra_filters]
-        )
+        video_filter_option = cls._get_video_filter_options([scale_filter, *hw_extra_filters])
         output_option = cls._get_output_option(output)
         return " ".join(
             [
@@ -110,16 +106,38 @@ class FFmpeg:
         )
 
     @classmethod
-    def _get_overwrite_option(cls, overwrite: bool = None) -> str:
-        if overwrite is True:
+    def _get_overwrite_option(
+        cls,
+        overwrite: OverwriteOptions = "ask",
+    ) -> str:
+        if overwrite == "always":
             return "-y"
-        elif overwrite is False:
+        elif overwrite == "never":
             return "-n"
-        else:
+        elif overwrite == "ask":
             return ""
+        else:
+            raise ValueError(f"overwrite param: expected 'always', 'never' or 'ask', got {overwrite}")
 
     @classmethod
-    def _get_hwaccel_and_encoder_and_extra_filters(cls) -> (str, str, List[str]):
+    def detect_gpu(cls) -> GpuOptions:
+        if cls._gpu is not None:
+            return cls._gpu
+        if check_command_exist("nvidia-smi"):
+            cls._gpu = "nvidia"
+        elif check_command_exist("radeontop"):
+            # working on Linux, not working on Windows
+            cls._gpu = "amd"
+        else:
+            print("no GPU detected")
+            cls._gpu = "no_gpu"
+        return cls._gpu
+
+    @classmethod
+    def _get_hwaccel_and_encoder_and_extra_filters(cls, use_gpu: bool) -> (str, str, List[str]):
+        if not use_gpu:
+            return "", "", []
+        GPU = cls.detect_gpu()
         if GPU == "nvidia":
             return "-hwaccel cuda", "-c:v hevc_nvenc", []
         elif GPU == "amd" and isWindows:

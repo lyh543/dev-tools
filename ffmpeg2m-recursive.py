@@ -4,9 +4,10 @@ from __init__ import *
 from ffmpeg2m import ffmpeg2m
 
 
-def ffmpeg2m_recursive(path="."):
+def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
     """
     :param path: directory path
+    :param use_gpu: True=use GPU if exists, False=use CPU
     :return: if is exited by Ctrl+C, clean unfinished output and return 255
     """
     file_list = traverse(
@@ -31,14 +32,12 @@ def ffmpeg2m_recursive(path="."):
     for i in range(len(input_output_list)):
         [input, output] = input_output_list[i]
         print(f"[{i + 1}/{len(input_output_list)}] ", end="")
-        value = ffmpeg2m(input, output, overwrite=False)
+        value = ffmpeg2m(input, output, use_gpu=use_gpu, overwrite="never")
         if value == 255:
             exit(value)
         print("\n")
 
 
 if __name__ == "__main__":
-    [path] = argparse(rest="return")
-    if path == "":
-        path = "."
-    ffmpeg2m_recursive(path)
+    [rest] = argparse(rest="return")
+    ffmpeg2m_recursive(".", "--cpu-only" not in rest)
