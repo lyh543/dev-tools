@@ -42,6 +42,11 @@ def argparse(
         return exact_params
 
 
+# get "foo.1.2" foo.1.2.txt
+def get_stem(file: str) -> str:
+    return file[: file.rfind(".")]
+
+
 def traverse(
     dir_path: str,
     filename_filter: FileFilter = no_filter,

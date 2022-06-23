@@ -138,22 +138,30 @@ class FFmpeg:
         return cls._gpu
 
     @classmethod
+    def _get_encoder_option(cls, video_encoder: str, audio_encoder="copy") -> str:
+        return f"-c:v {video_encoder} -c:a {audio_encoder}"
+
+    @classmethod
     def _get_hwaccel_and_encoder_and_extra_filters(
         cls, use_gpu: bool
     ) -> (str, str, List[str]):
         if not use_gpu:
-            return "", "", []
+            return "", cls._get_encoder_option("hevc"), []
         GPU = cls.detect_gpu()
         if GPU == "nvidia":
-            return "-hwaccel cuda", "-c:v hevc_nvenc", []
+            return "-hwaccel cuda", cls._get_encoder_option("hevc_nvenc"), []
         elif GPU == "amd" and isWindows:
-            return "-hwaccel amf", "-c:v hevc_amf", []
+            return "-hwaccel amf", cls._get_encoder_option("hevc_amf"), []
         elif GPU == "amd" and isMacOS:
             raise NotImplementedError
         elif GPU == "amd":
-            return "-hwaccel vaapi", "-c:v hevc_vaapi", ["format=nv12", "hwupload"]
+            return (
+                "-hwaccel vaapi",
+                cls._get_encoder_option("hevc_vaapi"),
+                ["format=nv12", "hwupload"],
+            )
         else:
-            return "", "hevc", []
+            return "", cls._get_encoder_option("hevc"), []
 
     @classmethod
     def _get_input_option(cls, input: str) -> str:

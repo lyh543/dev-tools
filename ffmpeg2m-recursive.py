@@ -18,7 +18,7 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
     filtered_file_list = list(
         filter(
             lambda f: f.split(".")[-2] != "compressed"
-            and f[: f.rfind(".")] + ".compressed.mp4" not in file_list,
+            and get_stem(f) + ".compressed.mp4" not in file_list,
             file_list,
         )
     )
