@@ -14,6 +14,7 @@ TEXT_FILE_EXTENSIONS = [
     "sh",
     "ps1",
 ]
+IMAGE_FILE_EXTENSIONS = ["jpg", "jpeg", "png"]
 VIDEO_FILE_EXTENSIONS = [
     "mp4",
     "avi",

@@ -43,8 +43,7 @@ def ffmpeg(
     # catch ctrl+c
     except KeyboardInterrupt:
         exit_code = 255
-
-    if exit_code == 255:
+    if exit_code > 0:
         print(f"cleanup (remove {output})...")
         sleep(0.5)
         try:
@@ -138,7 +137,7 @@ class FFmpeg:
         return cls._gpu
 
     @classmethod
-    def _get_encoder_option(cls, video_encoder: str, audio_encoder="copy") -> str:
+    def _get_encoder_option(cls, video_encoder: str, audio_encoder="aac") -> str:
         return f"-c:v {video_encoder} -c:a {audio_encoder}"
 
     @classmethod
