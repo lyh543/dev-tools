@@ -8,11 +8,11 @@ from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.dnspod.v20210323 import dnspod_client
 from tencentcloud.dnspod.v20210323.dnspod_client import DnspodClient
 
-del os.environ["HTTP_PROXY"]
-del os.environ["HTTPS_PROXY"]
+for key in ["HTTP_PROXY", "HTTPS_PROXY"]:
+    os.environ.pop(key, None)
 os.environ["NO_PROXY"] = "*"
 
-with open(Path(("~/.tccli/default.credential")).expanduser(), "r") as f:
+with open(Path("~/.tccli/default.credential").expanduser(), "r") as f:
     credential_json = json.load(f)
 secret_id = credential_json["secretId"]
 secret_key = credential_json["secretKey"]
