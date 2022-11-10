@@ -2,7 +2,7 @@ import __main__
 import pathlib
 import shlex
 import sys
-from typing import Literal
+from typing import Literal, List
 
 from lib.file_filter import *
 from lib.system_specific import *
@@ -22,7 +22,7 @@ def expand_path(path: str) -> str:
 
 def argparse(
     *argnames: str, rest: Literal["error", "ignore", "return"] = "ignore"
-) -> list[str]:
+) -> List[str]:
     """
     Usage:
         [param1, param2] = argparse("param1", "param2")
@@ -52,7 +52,7 @@ def traverse(
     dir_path: str,
     filename_filter: FileFilter = no_filter,
     dirname_filter: FileFilter = no_filter,
-) -> list:
+) -> List:
     """
     traverse a directory and return a list of files
     will only traverse dirs that dirname_filter(dirname, dirpath) == True
