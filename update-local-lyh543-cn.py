@@ -10,7 +10,7 @@ from lib.tencent_cloud_sdk import create_dnspod_client
 
 def get_local_ip() -> str:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 53))
+    s.connect(("www.baidu.com", 443))
     local_ip = s.getsockname()[0]
     s.close()
     if not local_ip.startswith("192.168."):
