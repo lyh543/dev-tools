@@ -20,7 +20,7 @@ WINDOWS_GIT_PRE_COMMIT = f"""#!/bin/sh
 {git_hooks_logging_cmd_started('linting **/*.py')}
 black {DEV_TOOLS_ROOT_POSIX}/*.py {DEV_TOOLS_ROOT_POSIX}/**/*.py
 {git_hooks_logging_cmd_done('linting **/*.py')}
-python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
+{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
 POSIX_GIT_POST_MERGE = f"""#!/bin/sh
@@ -28,7 +28,7 @@ python3 {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
 WINDOWS_GIT_POST_MERGE = f"""#!/bin/sh
-python {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
+{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
 
 
@@ -49,4 +49,4 @@ def update_git_hooks():
 
 if __name__ == "__main__":
     update_git_hooks()
-    system(f"python {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py")
+    system(f"{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT_POSIX}/dev-tools-generate-shell.py")

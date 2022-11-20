@@ -15,7 +15,7 @@ def generate_shell_windows(basename: str):
         print(basename + " command already exists, skip")
         return
     with open(TARGET_DIR / (basename + ".cmd"), "w", encoding="utf-8") as f:
-        f.write(r"@python.exe %~dp0\..\%~n0.py %*")
+        f.write(rf"@{PYTHON_EXECUTABLE} %~dp0\..\%~n0.py %*")
 
 
 def generate_shell_linux(basename: str):
@@ -24,7 +24,7 @@ def generate_shell_linux(basename: str):
         return
     with open(TARGET_DIR / basename, "w", encoding="utf-8") as f:
         f.write(
-            f"""#!/bin/sh \n""" + f"""python {DEV_TOOLS_ROOT}/{basename}.py "$@" """
+            f"""#!/bin/sh \n""" + f"""{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT}/{basename}.py "$@" """
         )
     os.chmod(TARGET_DIR / basename, 0o755)
 

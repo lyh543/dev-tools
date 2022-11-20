@@ -5,7 +5,7 @@ from datetime import datetime
 
 system(
     "pushd ~/git/bitme",
-    "python replace.py pull",
+    f"{PYTHON_EXECUTABLE} replace.py pull",
     "popd",
     run_pwsh_on_win=True,
 )
