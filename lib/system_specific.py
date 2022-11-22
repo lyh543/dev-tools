@@ -78,9 +78,9 @@ def check_command_exist(command: str) -> bool:
     :return: True if command exists
     """
     if isWindows:
-        which = "where.exe " + command
+        which = f"where.exe {command}.exe"
     else:
-        which = "which " + command
+        which = f"which {command}"
     return (
         system(
             which,

@@ -8,7 +8,7 @@ from lib.file_filter import *
 from lib.system_specific import *
 
 MAIN_FILE = pathlib.Path(__main__.__file__)
-PYTHON_EXECUTABLE = sys.executable
+PYTHON_EXECUTABLE = sys.executable.replace("\\", "/")
 
 
 def expand_path(path: str) -> str:
