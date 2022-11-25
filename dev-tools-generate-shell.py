@@ -24,7 +24,8 @@ def generate_shell_linux(basename: str):
         return
     with open(TARGET_DIR / basename, "w", encoding="utf-8") as f:
         f.write(
-            f"""#!/bin/sh \n""" + f"""{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT}/{basename}.py "$@" """
+            f"""#!/bin/sh \n"""
+            + f"""{PYTHON_EXECUTABLE} {DEV_TOOLS_ROOT}/{basename}.py "$@" """
         )
     os.chmod(TARGET_DIR / basename, 0o755)
 
