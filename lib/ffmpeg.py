@@ -28,15 +28,23 @@ def ffmpeg(
     :param resolution: [width, height] e.g. [-1, 720] for auto:720p
     :return: command to run
     """
-    command = FFmpeg.ffmpeg_command(
-        input=input,
-        output=output,
-        use_gpu=use_gpu,
-        overwrite=overwrite,
-        video_bitrate=video_bitrate,
-        audio_bitrate=audio_bitrate,
-        resolution=resolution,
-    )
+    if not output.endswith("mp3"):
+        command = FFmpeg.ffmpeg_command(
+            input=input,
+            output=output,
+            use_gpu=use_gpu,
+            overwrite=overwrite,
+            video_bitrate=video_bitrate,
+            audio_bitrate=audio_bitrate,
+            resolution=resolution,
+        )
+    else:
+        command = FFmpeg.ffmpeg_audio_command(
+            input=input,
+            output=output,
+            overwrite=overwrite,
+            audio_bitrate=audio_bitrate,
+        )
     print(">>>", command)
     try:
         exit_code = system(command, exit_on_errors=False)
@@ -102,6 +110,36 @@ class FFmpeg:
                 audio_bitrate_option,
                 video_filter_option,
                 video_encoder_option,
+                output_option,
+            ]
+        )
+
+    @classmethod
+    def ffmpeg_audio_command(
+        cls,
+        input: str,
+        output: str,
+        overwrite: OverwriteOptions = "ask",
+        audio_bitrate: str = None,
+    ) -> str:
+        """
+        generate command for ffmpeg
+
+        :param input: input file path e.g. "input.mov"
+        :param output: output file path e.g. "output.mp4"
+        :param overwrite: "always" "never" "ask"
+        :param audio_bitrate: e.g. "128K" for 128Kbps
+        """
+        overwrite_option = cls._get_overwrite_option(overwrite)
+        input_option = cls._get_input_option(input)
+        audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
+        output_option = cls._get_output_option(output)
+        return " ".join(
+            [
+                "ffmpeg",
+                overwrite_option,
+                input_option,
+                audio_bitrate_option,
                 output_option,
             ]
         )

@@ -1,2 +1,4 @@
 tencentcloud-sdk-python>=3.0.648
 tccli>=3.0.648
+requests>=2.26.0
+you-get>=0.4.1650
