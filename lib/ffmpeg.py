@@ -166,9 +166,9 @@ class FFmpeg:
             return cls._gpu
         if check_command_exist("nvidia-smi"):
             cls._gpu = "nvidia"
-        elif check_command_exist("radeontop"):
-            # working on Linux, not working on Windows
-            cls._gpu = "amd"
+        # elif check_command_exist("radeontop"):
+        #     # working on Linux, not working on Windows
+        #     cls._gpu = "amd"
         else:
             print("no GPU detected")
             cls._gpu = "no_gpu"
