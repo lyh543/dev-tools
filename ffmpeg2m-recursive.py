@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import click
 from __init__ import *
 from ffmpeg2m import ffmpeg2m
 
@@ -38,6 +39,12 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
         print("\n")
 
 
+@click.command()
+@click.option("--use_gpu", is_flag=True, default=True, help="Use GPU if exists")
+@click.argument("path", default=".")
+def main(path: str, use_gpu: bool = True):
+    ffmpeg2m_recursive(path, use_gpu=not use_gpu)
+
+
 if __name__ == "__main__":
-    [rest] = argparse(rest="return")
-    ffmpeg2m_recursive(".", "--cpu-only" not in rest)
+    main()

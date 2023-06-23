@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
+import click
 
 from tencentcloud.dnspod.v20210323 import models
 
@@ -46,7 +47,12 @@ def update_local_lyh543_cn(domain: str, subdomain: str, ip: str):
     print(f"{full_domain} updated to {ip}")
 
 
-if __name__ == "__main__":
-    [subdomain] = argparse("subdomain", rest="error")
+@click.command()
+@click.argument("subdomain")
+def main(subdomain: str):
     local_ip = get_local_ip()
     update_local_lyh543_cn("lyh543.cn", subdomain, get_local_ip())
+
+
+if __name__ == "__main__":
+    main()

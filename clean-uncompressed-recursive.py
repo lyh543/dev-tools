@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import click
 from __init__ import *
 from lib.image import *
 
@@ -35,6 +36,11 @@ def clean_uncompressed_recursive(path="."):
             os.remove(file)
 
 
+@click.command()
+@click.argument("path", default=".")
+def main(path: str):
+    clean_uncompressed_recursive(path)
+
+
 if __name__ == "__main__":
-    [rest] = argparse(rest="return")
-    clean_uncompressed_recursive(".")
+    main()

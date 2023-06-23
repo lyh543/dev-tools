@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-from time import sleep
-from typing import Optional
 
+import click
 from __init__ import *
 from lib.ffmpeg import ffmpeg, OverwriteOptions
 
@@ -27,6 +26,13 @@ def ffmpeg2m(
     )
 
 
+@click.command()
+@click.option("--use_gpu", is_flag=True, default=True, help="Use GPU if exists")
+@click.argument("input")
+@click.argument("output")
+def main(input: str, output: str, use_gpu: bool = True):
+    ffmpeg2m(input, output, use_gpu=use_gpu)
+
+
 if __name__ == "__main__":
-    [input, output] = argparse("input", "output", rest="error")
-    exit(ffmpeg2m(input, output))
+    main()

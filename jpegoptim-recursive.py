@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import click
 from __init__ import *
 from lib.image import *
 
@@ -42,6 +43,11 @@ def jpegoptim_recursive(path="."):
         print("\n")
 
 
+@click.command()
+@click.argument("path", default=".")
+def main(path: str):
+    jpegoptim_recursive(path)
+
+
 if __name__ == "__main__":
-    [rest] = argparse(rest="return")
-    jpegoptim_recursive(".")
+    main()

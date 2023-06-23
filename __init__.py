@@ -1,8 +1,7 @@
 import __main__
 import pathlib
-import shlex
 import sys
-from typing import Literal, List
+from typing import List
 
 from lib.file_filter import *
 from lib.system_specific import *
@@ -18,29 +17,6 @@ def expand_path(path: str) -> str:
     :return: an absolute path
     """
     return str(pathlib.Path(path).expanduser().absolute())
-
-
-def argparse(
-    *argnames: str, rest: Literal["error", "ignore", "return"] = "ignore"
-) -> List[str]:
-    """
-    Usage:
-        [param1, param2] = argparse("param1", "param2")
-        [param1, param2, rest] = argparse("param1", "param2", rest='return')
-    """
-    args = sys.argv[1:]
-    if len(args) < len(argnames) or (len(args) > len(argnames) and rest == "error"):
-        filename = MAIN_FILE.name
-        wrapped_argnames = " ".join(map(lambda x: "<" + x + ">", argnames))
-        print(f"Usage: {filename} {wrapped_argnames}")
-        sys.exit(1)
-
-    exact_params = args[: len(argnames)]
-    rest_params = args[len(argnames) :]
-    if rest == "return":
-        return exact_params + [shlex.join(rest_params)]
-    else:
-        return exact_params
 
 
 # get "foo.1.2" foo.1.2.txt

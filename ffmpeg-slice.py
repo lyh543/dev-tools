@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
+import traceback
 from typing import Tuple
+
+import click
 
 from __init__ import *
 
@@ -34,13 +37,19 @@ def ffmpeg_slice(input_name: str, time_range_list: List[Tuple[str, str]]) -> int
     pathlib.Path(slice_list_filename).unlink()
 
 
-if __name__ == "__main__":
-    [input, time_ranges] = argparse("input", rest="return")
+@click.command()
+@click.argument("input")
+@click.argument("time_range", nargs=-1)
+def main(input: str, time_range: List[str]) -> None:
     try:
-        time_range_list = list(map(lambda x: x.split("-"), time_ranges.split(" ")))
+        time_range_list = [range.split("-") for range in time_range]
         for i in range(len(time_range_list)):
             print(f"Slice {i + 1}: {time_range_list[i]} ")
         ffmpeg_slice(input, time_range_list)
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         print("Usage: ffmpeg-slice.py <input> [hh:mm:ss-hh:mm:ss] [hh:mm:ss-hh:mm:ss]")
+
+
+if __name__ == "__main__":
+    main()

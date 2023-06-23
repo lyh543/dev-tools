@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import click
 from __init__ import *
 
 
@@ -35,11 +36,17 @@ def replace_pattern(file: str, old: str, new: str) -> int:
         return 0
 
 
-[folder] = argparse("folder", rest="error")
-file_list = traverse(
-    folder,
-    filename_filter=extension_allow_filter(TEXT_FILE_EXTENSIONS),
-    dirname_filter=filename_block_filter(COMMON_IGNORED_DIRECTORIES),
-)
-for file in file_list:
-    replace_pattern(file, "\r\n", "\n")
+@click.command()
+@click.argument("folder")
+def main(folder: str):
+    file_list = traverse(
+        folder,
+        filename_filter=extension_allow_filter(TEXT_FILE_EXTENSIONS),
+        dirname_filter=filename_block_filter(COMMON_IGNORED_DIRECTORIES),
+    )
+    for file in file_list:
+        replace_pattern(file, "\r\n", "\n")
+
+
+if __name__ == "__main__":
+    main()

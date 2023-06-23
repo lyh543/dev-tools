@@ -1,3 +1,4 @@
+import click
 from __init__ import *
 from lib.ffmpeg import ffmpeg
 import requests
@@ -27,8 +28,9 @@ def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
     os.system(f"you-get -o {save_dir} -O {name} {url}")
 
 
-if __name__ == "__main__":
-    [url] = argparse(["url"], rest="error")
+@click.command()
+@click.argument("url")
+def main(url: str):
     bv = parse_bv_from_url(url)
     save_dir = pathlib.Path.cwd()
     video_path = save_dir / f"{bv}.mp4"
@@ -46,3 +48,7 @@ if __name__ == "__main__":
     )
     music_path.rename(music_path.parent / f"{clean_title}.mp3")
     print(f"Done! {clean_title}.mp3")
+
+
+if __name__ == "__main__":
+    main()
