@@ -1,7 +1,9 @@
+import tempfile
 import click
 from __init__ import *
 from lib.ffmpeg import ffmpeg
 import requests
+import shutil
 import re
 import os
 import pathlib
@@ -29,10 +31,13 @@ def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
 
 
 @click.command()
+@click.option("--temp_dir", default=None, help="temp dir to save video")
 @click.argument("url")
-def main(url: str):
+def main(url: str, temp_dir: str):
     bv = parse_bv_from_url(url)
-    save_dir = pathlib.Path.cwd()
+    save_dir = pathlib.Path(
+        temp_dir if temp_dir else tempfile.TemporaryDirectory().name
+    )
     video_path = save_dir / f"{bv}.mp4"
     music_path = save_dir / f"{bv}.mp3"
 
@@ -46,7 +51,7 @@ def main(url: str):
         overwrite="always",
         audio_bitrate="256K",
     )
-    music_path.rename(music_path.parent / f"{clean_title}.mp3")
+    shutil.move(music_path, f"{clean_title}.mp3")
     print(f"Done! {clean_title}.mp3")
 
 
