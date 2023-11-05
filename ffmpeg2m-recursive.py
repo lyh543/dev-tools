@@ -41,7 +41,9 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
 
 
 @click.command()
-@click.option("--use_gpu/--not_use_gpu", is_flag=True, default=True, help="Use GPU if exists")
+@click.option(
+    "--use_gpu/--not_use_gpu", is_flag=True, default=True, help="Use GPU if exists"
+)
 @click.argument("path", default=".")
 def main(path: str, use_gpu: bool = True):
     setup_logger()

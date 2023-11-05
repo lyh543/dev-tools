@@ -35,7 +35,6 @@ def get_bilibili_video_title(url: str) -> str:
         return bv
 
 
-
 def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
     os.system(f"you-get -o {save_dir} -O {name} {url}")
 
