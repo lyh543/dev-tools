@@ -1,3 +1,7 @@
+import logging
+import sys
+
+
 def _log_started_str(operation: str):
     return f">>> GIT_HOOKS started: {operation}"
 
@@ -25,3 +29,7 @@ def git_hooks_logging_cmd_started(operation: str):
 
 def git_hooks_logging_cmd_done(operation: str):
     return f'echo "{_log_done_str(operation)}"'
+
+
+def setup_logger():
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)

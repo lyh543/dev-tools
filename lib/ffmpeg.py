@@ -1,3 +1,4 @@
+import logging
 from time import sleep
 from typing import List, Literal
 
@@ -185,6 +186,7 @@ class FFmpeg:
         if not use_gpu:
             return "", cls._get_encoder_option("hevc"), []
         GPU = cls.detect_gpu()
+        logging.info(f"detect GPU: {GPU}")
         if GPU == "nvidia":
             return "-hwaccel cuda", cls._get_encoder_option("hevc_nvenc"), []
         elif GPU == "amd" and isWindows:

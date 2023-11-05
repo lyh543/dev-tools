@@ -3,6 +3,7 @@
 import click
 from __init__ import *
 from ffmpeg2m import ffmpeg2m
+from lib.log import setup_logger
 
 
 def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
@@ -40,10 +41,11 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
 
 
 @click.command()
-@click.option("--use_gpu", is_flag=True, default=True, help="Use GPU if exists")
+@click.option("--use_gpu/--not_use_gpu", is_flag=True, default=True, help="Use GPU if exists")
 @click.argument("path", default=".")
 def main(path: str, use_gpu: bool = True):
-    ffmpeg2m_recursive(path, use_gpu=not use_gpu)
+    setup_logger()
+    ffmpeg2m_recursive(path, use_gpu=use_gpu)
 
 
 if __name__ == "__main__":

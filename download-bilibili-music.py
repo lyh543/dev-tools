@@ -1,12 +1,16 @@
 import tempfile
-import click
-from __init__ import *
-from lib.ffmpeg import ffmpeg
-import requests
+import logging
 import shutil
 import re
 import os
 import pathlib
+
+import click
+import requests
+
+from __init__ import *
+from lib.ffmpeg import ffmpeg
+from lib.log import setup_logger
 
 TITLE_REGEXP = re.compile(r"<title.*?>(.*)_哔哩哔哩_bilibili</title>")
 
@@ -22,8 +26,14 @@ def parse_bv_from_url(url: str) -> str:
 
 def get_bilibili_video_title(url: str) -> str:
     response = requests.get(url)
-    re_search_result = re.search(TITLE_REGEXP, response.text)
-    return re_search_result.group(1)
+    try:
+        re_search_result = re.search(TITLE_REGEXP, response.text)
+        return re_search_result.group(1)
+    except AttributeError:
+        bv = parse_bv_from_url(url)
+        logging.warning(f"Cannot find title in response text, use BV: {bv}")
+        return bv
+
 
 
 def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
@@ -34,6 +44,7 @@ def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
 @click.option("--temp_dir", default=None, help="temp dir to save video")
 @click.argument("url")
 def main(url: str, temp_dir: str):
+    setup_logger()
     bv = parse_bv_from_url(url)
     save_dir = pathlib.Path(
         temp_dir if temp_dir else tempfile.TemporaryDirectory().name

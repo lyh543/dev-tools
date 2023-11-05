@@ -3,6 +3,7 @@
 import click
 from __init__ import *
 from lib.ffmpeg import ffmpeg, OverwriteOptions
+from lib.log import setup_logger
 
 
 def ffmpeg2m(
@@ -31,6 +32,7 @@ def ffmpeg2m(
 @click.argument("input")
 @click.argument("output")
 def main(input: str, output: str, use_gpu: bool = True):
+    setup_logger()
     ffmpeg2m(input, output, use_gpu=use_gpu)
 
 
