@@ -13,6 +13,9 @@ from lib.ffmpeg import ffmpeg
 from lib.log import setup_logger
 
 TITLE_REGEXP = re.compile(r"<title.*?>(.*)_哔哩哔哩_bilibili</title>")
+BROWSER_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+}
 
 
 def clean_filename(name: str) -> str:
@@ -25,7 +28,7 @@ def parse_bv_from_url(url: str) -> str:
 
 
 def get_bilibili_video_title(url: str) -> str:
-    response = requests.get(url)
+    response = requests.get(url, headers=BROWSER_HEADERS)
     try:
         re_search_result = re.search(TITLE_REGEXP, response.text)
         return re_search_result.group(1)
