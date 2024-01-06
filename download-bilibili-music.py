@@ -4,6 +4,7 @@ import shutil
 import re
 import os
 import pathlib
+from bs4 import BeautifulSoup
 
 import click
 import requests
@@ -12,7 +13,6 @@ from __init__ import *
 from lib.ffmpeg import ffmpeg
 from lib.log import setup_logger
 
-TITLE_REGEXP = re.compile(r"<title.*?>(.*)_哔哩哔哩_bilibili</title>")
 BROWSER_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 }
@@ -30,8 +30,9 @@ def parse_bv_from_url(url: str) -> str:
 def get_bilibili_video_title(url: str) -> str:
     response = requests.get(url, headers=BROWSER_HEADERS)
     try:
-        re_search_result = re.search(TITLE_REGEXP, response.text)
-        return re_search_result.group(1)
+        title = BeautifulSoup(response.text, features="lxml").title.string
+        logging.info(f"Title: {title}")
+        return title
     except AttributeError:
         bv = parse_bv_from_url(url)
         logging.warning(f"Cannot find title in response text, use BV: {bv}")
@@ -65,7 +66,7 @@ def main(url: str, temp_dir: str):
         audio_bitrate="256K",
     )
     shutil.move(music_path, f"{clean_title}.mp3")
-    print(f"Done! {clean_title}.mp3")
+    logging.info(f"Done! {clean_title}.mp3")
 
 
 if __name__ == "__main__":
