@@ -45,10 +45,18 @@ def download_bilibili_video(url: str, save_dir: pathlib.Path, name: str):
 
 @click.command()
 @click.option("--temp_dir", default=None, help="temp dir to save video")
-@click.argument("url")
-def main(url: str, temp_dir: str):
+@click.argument("bv_or_url")
+def main(bv_or_url: str, temp_dir: str):
+    """
+    BV_OR_URL: bilibili video bv (BV1gb4y1n7rQ) or url (https://www.bilibili.com/video/BV1gb4y1n7rQ)
+    """
     setup_logger()
-    bv = parse_bv_from_url(url)
+    if bv_or_url.lower().startswith("bv"):
+        bv = bv_or_url
+        url = f"https://www.bilibili.com/video/{bv}/"
+    else:
+        url = bv_or_url
+        bv = parse_bv_from_url(url)
     save_dir = pathlib.Path(
         temp_dir if temp_dir else tempfile.TemporaryDirectory().name
     )
