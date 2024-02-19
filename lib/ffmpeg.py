@@ -1,6 +1,6 @@
 import logging
 from time import sleep
-from typing import List, Literal, Tuple
+from typing import List, Literal, Optional, Tuple
 
 from .system_specific import *
 
@@ -16,6 +16,8 @@ def ffmpeg(
     video_bitrate: str = None,
     audio_bitrate: str = None,
     resolution: Tuple[int, int] = None,
+    rate: int = None,
+    prepend_video_filters: List[str] = None,
     copy_mode: bool = False,
 ):
     """
@@ -28,6 +30,8 @@ def ffmpeg(
     :param video_bitrate: e.g. "2M" for 2Mbps
     :param audio_bitrate: e.g. "128K" for 128Kbps
     :param resolution: [width, height] e.g. [-1, 720] for auto:720p
+    :param rate: e.g. 30 for 30fps
+    :param prepend_video_filters: e.g. ["mpdecimate"]
     :param copy_mode: True=copy video and audio stream, False=encode video and audio stream
     """
     if copy_mode:
@@ -45,6 +49,8 @@ def ffmpeg(
             video_bitrate=video_bitrate,
             audio_bitrate=audio_bitrate,
             resolution=resolution,
+            rate=rate,
+            prepend_video_filters=prepend_video_filters,
         )
     else:
         command = FFmpeg.ffmpeg_audio_command(
@@ -79,9 +85,11 @@ class FFmpeg:
         output: str,
         use_gpu: bool = True,
         overwrite: OverwriteOptions = "ask",
-        video_bitrate: str = None,
-        audio_bitrate: str = None,
-        resolution: Tuple[int, int] = None,
+        video_bitrate: Optional[str] = None,
+        audio_bitrate: Optional[str] = None,
+        rate: Optional[int] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        prepend_video_filters: Optional[List[str]] = None,
     ) -> str:
         """
         generate command for ffmpeg
@@ -92,7 +100,9 @@ class FFmpeg:
         :param overwrite: "always" "never" "ask"
         :param video_bitrate: e.g. "2M" for 2Mbps
         :param audio_bitrate: e.g. "128K" for 128Kbps
+        :param rate: e.g. 30 for 30fps
         :param resolution: [width, height] e.g. [-1, 720] for auto:720p
+        :param prepend_video_filters: e.g. ["mpdecimate"]
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         [
@@ -103,9 +113,10 @@ class FFmpeg:
         input_option = cls._get_input_option(input)
         video_bitrate_option = cls._get_bitrate_option("video", video_bitrate)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
+        rate_option = cls._get_rate_option(rate)
         scale_filter = cls._get_video_filter_scale(resolution)
         video_filter_option = cls._get_video_filter_options(
-            [scale_filter, *hw_extra_filters]
+            [*(prepend_video_filters or []), scale_filter, *hw_extra_filters]
         )
         output_option = cls._get_output_option(output)
         return " ".join(
@@ -116,6 +127,7 @@ class FFmpeg:
                 input_option,
                 video_bitrate_option,
                 audio_bitrate_option,
+                rate_option,
                 video_filter_option,
                 video_encoder_option,
                 output_option,
@@ -158,8 +170,8 @@ class FFmpeg:
         input: str,
         output: str,
         overwrite: OverwriteOptions = "ask",
-        video_encode="copy",
-        audio_encode="copy",
+        video_encoder="copy",
+        audio_encoder="copy",
     ) -> str:
         """
         generate command for ffmpeg
@@ -172,7 +184,7 @@ class FFmpeg:
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         input_option = cls._get_input_option(input)
-        video_encoder_option = cls._get_encoder_option(video_encode, audio_encode)
+        video_encoder_option = cls._get_encoder_option(video_encoder, audio_encoder)
         output_option = cls._get_output_option(output)
         return " ".join(
             [
@@ -256,7 +268,13 @@ class FFmpeg:
         return f"-b:{type[0]} {bitrate}"
 
     @classmethod
-    def _get_video_filter_scale(cls, resolution: [int, int] = None) -> str:
+    def _get_rate_option(cls, rate: int = None) -> str:
+        if rate is None:
+            return ""
+        return f"-r {rate}"
+
+    @classmethod
+    def _get_video_filter_scale(cls, resolution: Tuple[int, int] = None) -> str:
         if resolution is None:
             return ""
         [width, height] = resolution
