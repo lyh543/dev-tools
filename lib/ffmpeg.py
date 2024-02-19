@@ -1,6 +1,6 @@
 import logging
 from time import sleep
-from typing import List, Literal
+from typing import List, Literal, Tuple
 
 from .system_specific import *
 
@@ -15,7 +15,8 @@ def ffmpeg(
     overwrite: OverwriteOptions = "ask",
     video_bitrate: str = None,
     audio_bitrate: str = None,
-    resolution: [int, int] = None,
+    resolution: Tuple[int, int] = None,
+    copy_mode: bool = False,
 ):
     """
     run ffmpeg command
@@ -27,9 +28,15 @@ def ffmpeg(
     :param video_bitrate: e.g. "2M" for 2Mbps
     :param audio_bitrate: e.g. "128K" for 128Kbps
     :param resolution: [width, height] e.g. [-1, 720] for auto:720p
-    :return: command to run
+    :param copy_mode: True=copy video and audio stream, False=encode video and audio stream
     """
-    if not output.endswith("mp3"):
+    if copy_mode:
+        command = FFmpeg.ffmpeg_copy_command(
+            input=input,
+            output=output,
+            overwrite=overwrite,
+        )
+    elif not output.endswith("mp3"):
         command = FFmpeg.ffmpeg_command(
             input=input,
             output=output,
@@ -74,7 +81,7 @@ class FFmpeg:
         overwrite: OverwriteOptions = "ask",
         video_bitrate: str = None,
         audio_bitrate: str = None,
-        resolution: [int, int] = None,
+        resolution: Tuple[int, int] = None,
     ) -> str:
         """
         generate command for ffmpeg
@@ -146,6 +153,38 @@ class FFmpeg:
         )
 
     @classmethod
+    def ffmpeg_copy_command(
+        cls,
+        input: str,
+        output: str,
+        overwrite: OverwriteOptions = "ask",
+        video_encode="copy",
+        audio_encode="copy",
+    ) -> str:
+        """
+        generate command for ffmpeg
+
+        :param input: input file path e.g. "input.mov"
+        :param output: output file path e.g. "output.mp4"
+        :param overwrite: "always" "never" "ask"
+        :param video_encode: e.g. "copy" or "hevc"
+        :param audio_encode: e.g. "copy" or "aac"
+        """
+        overwrite_option = cls._get_overwrite_option(overwrite)
+        input_option = cls._get_input_option(input)
+        video_encoder_option = cls._get_encoder_option(video_encode, audio_encode)
+        output_option = cls._get_output_option(output)
+        return " ".join(
+            [
+                "ffmpeg",
+                overwrite_option,
+                input_option,
+                video_encoder_option,
+                output_option,
+            ]
+        )
+
+    @classmethod
     def _get_overwrite_option(
         cls,
         overwrite: OverwriteOptions = "ask",
@@ -182,7 +221,7 @@ class FFmpeg:
     @classmethod
     def _get_hwaccel_and_encoder_and_extra_filters(
         cls, use_gpu: bool
-    ) -> (str, str, List[str]):
+    ) -> Tuple[str, str, List[str]]:
         if not use_gpu:
             return "", cls._get_encoder_option("hevc"), []
         GPU = cls.detect_gpu()
