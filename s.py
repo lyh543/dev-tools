@@ -2,4 +2,4 @@
 
 from __init__ import *
 
-system("ssh liu@lyh543.cn -p 222")
+system("ssh liu@server.lyh543.cn -p 222")

@@ -12,7 +12,7 @@ DEV_TOOLS_GIT_HOOKS = DEV_TOOLS_ROOT / ".git" / "hooks"
 POSIX_GIT_PRE_COMMIT = f"""#!/bin/sh
 set -e
 {git_hooks_logging_cmd_started('linting **/*.py')}
-black {DEV_TOOLS_ROOT_POSIX}/*.py {DEV_TOOLS_ROOT_POSIX}/**/*.py --check || (black {DEV_TOOLS_ROOT_POSIX}/*.py {DEV_TOOLS_ROOT_POSIX}/**/*.py; exit 1)`
+black {DEV_TOOLS_ROOT_POSIX}/*.py {DEV_TOOLS_ROOT_POSIX}/**/*.py --check || (black {DEV_TOOLS_ROOT_POSIX}/*.py {DEV_TOOLS_ROOT_POSIX}/**/*.py; exit 1)
 {git_hooks_logging_cmd_done('linting **/*.py')}
 python3 {DEV_TOOLS_ROOT_POSIX}/dev-tools-install-git-repo.py
 """
