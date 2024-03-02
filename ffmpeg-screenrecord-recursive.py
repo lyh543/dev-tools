@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from concurrent.futures import ThreadPoolExecutor
 import click
 from __init__ import *
 from lib.ffmpeg import ffmpeg, OverwriteOptions
@@ -54,13 +55,19 @@ def ffmpeg_screen_record_recursive(path=".", use_gpu: bool = True):
     input_output_list = list(zip(filtered_file_list, output_list))
     input_output_str = map(lambda x: " -> ".join(x), input_output_list)
     print("file_list:", "\n".join(input_output_str), sep="\n", end="\n\n")
-    for i in range(len(input_output_list)):
-        [input, output] = input_output_list[i]
-        print(f"[{i + 1}/{len(input_output_list)}] ", end="")
+
+    def func(input_output):
+        [input, output] = input_output
         value = ffmpeg_screen_record(input, output, use_gpu=use_gpu, overwrite="never")
-        if value in [255, 65280]:
-            exit(value)
-        print("\n")
+        # TODO: support Ctrl+C, after cleanup of other threads is handled correctly
+        # if value in [255, 65280]:
+        #     print("exiting")
+        #     exit(value)
+        # print("\n")
+        return value
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        list(executor.map(func, input_output_list))
 
 
 @click.command()
