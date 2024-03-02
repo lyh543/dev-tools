@@ -23,8 +23,9 @@ def ffmpeg_screen_record(
         overwrite=overwrite,
         video_bitrate="2M",
         audio_bitrate="128K",
-        rate=30,
-        prepend_video_filters=["mpdecimate"],
+        fps=30,
+        fps_change_mode="vsync",
+        drop_duplicate_frames=True,
     )
 
 
@@ -57,7 +58,7 @@ def ffmpeg_screen_record_recursive(path=".", use_gpu: bool = True):
         [input, output] = input_output_list[i]
         print(f"[{i + 1}/{len(input_output_list)}] ", end="")
         value = ffmpeg_screen_record(input, output, use_gpu=use_gpu, overwrite="never")
-        if value == 255:
+        if value in [255, 65280]:
             exit(value)
         print("\n")
 

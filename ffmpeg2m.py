@@ -24,11 +24,14 @@ def ffmpeg2m(
         video_bitrate="2M",
         audio_bitrate="128K",
         resolution=[-1, 1080],
+        drop_duplicate_frames=True,
     )
 
 
 @click.command()
-@click.option("--use_gpu", is_flag=True, default=True, help="Use GPU if exists")
+@click.option(
+    "--not_use_gpu", "use_gpu", is_flag=True, default=True, help="Do not use GPU"
+)
 @click.argument("input")
 @click.argument("output")
 def main(input: str, output: str, use_gpu: bool = True):

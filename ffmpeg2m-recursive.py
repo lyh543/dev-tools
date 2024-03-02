@@ -35,7 +35,7 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
         [input, output] = input_output_list[i]
         print(f"[{i + 1}/{len(input_output_list)}] ", end="")
         value = ffmpeg2m(input, output, use_gpu=use_gpu, overwrite="never")
-        if value == 255:
+        if value in [255, 65280]:
             exit(value)
         print("\n")
 

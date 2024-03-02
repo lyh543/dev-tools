@@ -16,8 +16,9 @@ def ffmpeg(
     video_bitrate: str = None,
     audio_bitrate: str = None,
     resolution: Tuple[int, int] = None,
-    rate: int = None,
-    prepend_video_filters: List[str] = None,
+    fps: Optional[int] = None,
+    fps_change_mode: Literal["output", "vsync"] = "vsync",
+    drop_duplicate_frames: bool = False,
     copy_mode: bool = False,
 ):
     """
@@ -30,8 +31,9 @@ def ffmpeg(
     :param video_bitrate: e.g. "2M" for 2Mbps
     :param audio_bitrate: e.g. "128K" for 128Kbps
     :param resolution: [width, height] e.g. [-1, 720] for auto:720p
-    :param rate: e.g. 30 for 30fps
-    :param prepend_video_filters: e.g. ["mpdecimate"]
+    :param fps: e.g. 30 for 30fps
+    :param: fps_change_mode: "vsync" for "-vf 'fps=xxx' -vsync 2", or "output" for "-r xxx" option. See https://trac.ffmpeg.org/wiki/ChangingFrameRate'
+    :param drop_duplicate_frames: whether use mpdecimate filter to drop duplicate frames
     :param copy_mode: True=copy video and audio stream, False=encode video and audio stream
     """
     if copy_mode:
@@ -49,8 +51,9 @@ def ffmpeg(
             video_bitrate=video_bitrate,
             audio_bitrate=audio_bitrate,
             resolution=resolution,
-            rate=rate,
-            prepend_video_filters=prepend_video_filters,
+            fps=fps,
+            fps_change_mode=fps_change_mode,
+            drop_duplicate_frames=drop_duplicate_frames,
         )
     else:
         command = FFmpeg.ffmpeg_audio_command(
@@ -87,9 +90,10 @@ class FFmpeg:
         overwrite: OverwriteOptions = "ask",
         video_bitrate: Optional[str] = None,
         audio_bitrate: Optional[str] = None,
-        rate: Optional[int] = None,
+        fps: Optional[int] = None,
+        fps_change_mode: Literal["output", "vsync"] = "vsync",
+        drop_duplicate_frames: bool = False,
         resolution: Optional[Tuple[int, int]] = None,
-        prepend_video_filters: Optional[List[str]] = None,
     ) -> str:
         """
         generate command for ffmpeg
@@ -100,9 +104,10 @@ class FFmpeg:
         :param overwrite: "always" "never" "ask"
         :param video_bitrate: e.g. "2M" for 2Mbps
         :param audio_bitrate: e.g. "128K" for 128Kbps
-        :param rate: e.g. 30 for 30fps
+        :param fps: e.g. 30 for 30fps.
+        :param fps_change_mode: "vsync" for "-vf 'fps=xxx' -vsync 2", or "output" for "-r xxx" option. See https://trac.ffmpeg.org/wiki/ChangingFrameRate
+        :param drop_duplicate_frames: whether use mpdecimate filter to drop duplicate frames
         :param resolution: [width, height] e.g. [-1, 720] for auto:720p
-        :param prepend_video_filters: e.g. ["mpdecimate"]
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         [
@@ -113,23 +118,33 @@ class FFmpeg:
         input_option = cls._get_input_option(input)
         video_bitrate_option = cls._get_bitrate_option("video", video_bitrate)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
-        rate_option = cls._get_rate_option(rate)
+        if fps_change_mode == "vsync":
+            fps_option = ""
+            fps_filter = cls._get_video_filter_fps(fps)
+            vsync_option = cls._get_vsync_option(2)
+        else:
+            fps_option = cls._get_fps_option(fps)
+            fps_filter = ""
+            vsync_option = ""
+        mpdecimate_filter = cls._get_video_filter_mpdecimate(drop_duplicate_frames)
         scale_filter = cls._get_video_filter_scale(resolution)
         video_filter_option = cls._get_video_filter_options(
-            [*(prepend_video_filters or []), scale_filter, *hw_extra_filters]
+            [fps_filter, mpdecimate_filter, scale_filter, *hw_extra_filters]
         )
         output_option = cls._get_output_option(output)
         return " ".join(
             [
                 "ffmpeg",
+                "-hide_banner",
                 overwrite_option,
                 hwaccel_option,
                 input_option,
                 video_bitrate_option,
                 audio_bitrate_option,
-                rate_option,
                 video_filter_option,
                 video_encoder_option,
+                vsync_option,
+                fps_option,
                 output_option,
             ]
         )
@@ -157,6 +172,7 @@ class FFmpeg:
         return " ".join(
             [
                 "ffmpeg",
+                "-hide_banner",
                 overwrite_option,
                 input_option,
                 audio_bitrate_option,
@@ -189,6 +205,7 @@ class FFmpeg:
         return " ".join(
             [
                 "ffmpeg",
+                "-hide_banner",
                 overwrite_option,
                 input_option,
                 video_encoder_option,
@@ -263,15 +280,15 @@ class FFmpeg:
 
     @classmethod
     def _get_bitrate_option(cls, type: str, bitrate: str = None) -> str:
-        if bitrate is None:
-            return ""
-        return f"-b:{type[0]} {bitrate}"
+        return f"-b:{type[0]} {bitrate}" if bitrate else ""
 
     @classmethod
-    def _get_rate_option(cls, rate: int = None) -> str:
-        if rate is None:
-            return ""
-        return f"-r {rate}"
+    def _get_fps_option(cls, fps: Optional[int] = None) -> str:
+        return f"-r {fps}" if fps else ""
+
+    @classmethod
+    def _get_vsync_option(cls, vsync: Optional[int] = None) -> str:
+        return f"-vsync {vsync}" if vsync else ""
 
     @classmethod
     def _get_video_filter_scale(cls, resolution: Tuple[int, int] = None) -> str:
@@ -279,6 +296,14 @@ class FFmpeg:
             return ""
         [width, height] = resolution
         return f"scale={width}:{height}"
+
+    @classmethod
+    def _get_video_filter_fps(cls, fps: Optional[int] = None) -> str:
+        return f"fps={fps}" if fps else ""
+
+    @classmethod
+    def _get_video_filter_mpdecimate(cls, mpdecimate: bool) -> str:
+        return "mpdecimate" if mpdecimate else ""
 
     @classmethod
     def _get_video_filter_options(cls, filter_list: List[str]) -> str:
