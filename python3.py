@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
+import sys
 from __init__ import *
 from datetime import datetime
 
 system(
-    "pushd ~/git/bitme",
-    f"{PYTHON_EXECUTABLE} replace.py pull",
-    "popd",
+    "python",
+    *sys.argv[1:],
     run_pwsh_on_win=True,
 )

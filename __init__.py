@@ -19,9 +19,13 @@ def expand_path(path: str) -> str:
     return str(pathlib.Path(path).expanduser().absolute())
 
 
-# get "foo.1.2" foo.1.2.txt
+def get_ext(file: str) -> str:
+    return os.path.splitext(file)[1]
+
+
+# get "./foo.1.2" from ./foo.1.2.txt
 def get_stem(file: str) -> str:
-    return file[: file.rfind(".")]
+    return os.path.splitext(file)[0]
 
 
 def traverse(
