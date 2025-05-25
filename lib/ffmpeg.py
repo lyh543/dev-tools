@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 from time import sleep
 from typing import List, Literal, Optional, Tuple
@@ -5,7 +6,7 @@ from typing import List, Literal, Optional, Tuple
 from .system_specific import *
 
 OverwriteOptions = Literal["always", "never", "ask"]
-GpuOptions = Literal["nvidia", "amd", "no_gpu", None]
+GpuOptions = Literal["nvidia", "amd", "amd_apu", "no_gpu", None]
 
 
 def ffmpeg(
@@ -126,8 +127,10 @@ class FFmpeg:
             fps_option = cls._get_fps_option(fps)
             fps_filter = ""
             vsync_option = ""
-        mpdecimate_filter = cls._get_video_filter_mpdecimate(drop_duplicate_frames)
-        scale_filter = cls._get_video_filter_scale(resolution)
+        mpdecimate_filter = cls._get_video_filter_mpdecimate(
+            drop_duplicate_frames, use_gpu=use_gpu
+        )
+        scale_filter = cls._get_video_filter_scale(resolution, use_gpu=use_gpu)
         video_filter_option = cls._get_video_filter_options(
             [fps_filter, mpdecimate_filter, scale_filter, *hw_extra_filters]
         )
@@ -235,6 +238,8 @@ class FFmpeg:
             return cls._gpu
         if check_command_exist("nvidia-smi"):
             cls._gpu = "nvidia"
+        elif check_command_exist("vainfo"):
+            cls._gpu = "amd_apu"  # TODO: distinguish AMD GPU and APU
         # elif check_command_exist("radeontop"):
         #     # working on Linux, not working on Windows
         #     cls._gpu = "amd"
@@ -251,12 +256,24 @@ class FFmpeg:
     def _get_hwaccel_and_encoder_and_extra_filters(
         cls, use_gpu: bool
     ) -> Tuple[str, str, List[str]]:
+        """
+        get hardware acceleration option, encoder option and extra filters for ffmpeg command.
+
+        Returns:
+            Tuple[str, str, List[str]]: hwaccel option, encoder option, extra filters
+        """
         if not use_gpu:
             return "", cls._get_encoder_option("hevc"), []
         GPU = cls.detect_gpu()
         logging.info(f"detect GPU: {GPU}")
         if GPU == "nvidia":
             return "-hwaccel cuda", cls._get_encoder_option("hevc_nvenc"), []
+        elif GPU == "amd_apu":
+            return (
+                "-hwaccel vaapi -hwaccel_output_format vaapi",
+                cls._get_encoder_option("hevc_vaapi"),
+                ["hwupload"],
+            )
         elif GPU == "amd" and isWindows:
             return "-hwaccel amf", cls._get_encoder_option("hevc_amf"), []
         elif GPU == "amd" and isMacOS:
@@ -291,10 +308,15 @@ class FFmpeg:
         return f"-vsync {vsync}" if vsync else ""
 
     @classmethod
-    def _get_video_filter_scale(cls, resolution: Tuple[int, int] = None) -> str:
+    def _get_video_filter_scale(
+        cls, resolution: Optional[Tuple[int, int]], use_gpu: bool
+    ) -> str:
         if resolution is None:
             return ""
         [width, height] = resolution
+        if use_gpu and cls._gpu == "amd_apu":
+            # AMD APU requires vaapi filter for scaling
+            return f"scale_vaapi=w={width}:h={height}:format=nv12"
         return f"scale={width}:{height}"
 
     @classmethod
@@ -302,7 +324,10 @@ class FFmpeg:
         return f"fps={fps}" if fps else ""
 
     @classmethod
-    def _get_video_filter_mpdecimate(cls, mpdecimate: bool) -> str:
+    def _get_video_filter_mpdecimate(cls, mpdecimate: bool, use_gpu: bool) -> str:
+        # AMD APU does not support mpdecimate filter
+        if use_gpu and cls._gpu == "amd_apu":
+            return ""
         return "mpdecimate" if mpdecimate else ""
 
     @classmethod
