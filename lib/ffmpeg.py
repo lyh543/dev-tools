@@ -236,16 +236,26 @@ class FFmpeg:
     def detect_gpu(cls) -> GpuOptions:
         if cls._gpu is not None:
             return cls._gpu
+        # Prefer NVIDIA if present
         if check_command_exist("nvidia-smi"):
             cls._gpu = "nvidia"
-        elif check_command_exist("vainfo"):
+            return cls._gpu
+        # Windows: detect AMD via vendor ID or compatibility string
+        if isWindows:
+            ps = "If (Get-CimInstance Win32_VideoController | Where-Object {$_.PNPDeviceID -match 'VEN_1002' -or $_.AdapterCompatibility -match 'Advanced Micro Devices'}) { exit 0 } else { exit 1 }"
+            exit_code = run_powershell(ps)
+            if exit_code == 0:
+                cls._gpu = "amd"
+                return cls._gpu
+        # Linux/Unix: detect VAAPI/APU (cannot distinguish discrete vs APU reliably here)
+        if check_command_exist("vainfo"):
             cls._gpu = "amd_apu"  # TODO: distinguish AMD GPU and APU
+            return cls._gpu
         # elif check_command_exist("radeontop"):
         #     # working on Linux, not working on Windows
         #     cls._gpu = "amd"
-        else:
-            print("no GPU detected")
-            cls._gpu = "no_gpu"
+        print("no GPU detected")
+        cls._gpu = "no_gpu"
         return cls._gpu
 
     @classmethod
@@ -275,7 +285,8 @@ class FFmpeg:
                 ["hwupload"],
             )
         elif GPU == "amd" and isWindows:
-            return "-hwaccel amf", cls._get_encoder_option("hevc_amf"), []
+            # decode via Direct3D 11, encode via AMF
+            return "-hwaccel d3d11va", cls._get_encoder_option("hevc_amf"), []
         elif GPU == "amd" and isMacOS:
             raise NotImplementedError
         elif GPU == "amd":

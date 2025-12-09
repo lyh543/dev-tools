@@ -1,0 +1,1 @@
+* 这个项目需要同时兼容 Windows 和 Linux 系统。需要查询当前使用的系统、运行 Powershell 命令时，请使用 `lib\system_specific.py` 模块中的函数。
