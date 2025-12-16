@@ -7,7 +7,7 @@ from lib.ffmpeg_utils import get_compressed_output_path
 from lib.log import setup_logger
 
 
-def ffmpeg2m(
+def ffmpeg8m(
     input: str, output: str, use_gpu: bool = True, overwrite: OverwriteOptions = "ask"
 ) -> int:
     """
@@ -22,9 +22,8 @@ def ffmpeg2m(
         output=output,
         use_gpu=use_gpu,
         overwrite=overwrite,
-        video_bitrate="2M",
+        video_bitrate="8M",
         audio_bitrate="128K",
-        resolution=[-1, 1080],
         drop_duplicate_frames=True,
     )
 
@@ -39,7 +38,7 @@ def main(input: str, output: str, use_gpu: bool = True):
     setup_logger()
     if not output:
         output = get_compressed_output_path(input)
-    ffmpeg2m(input, output, use_gpu=use_gpu)
+    ffmpeg8m(input, output, use_gpu=use_gpu)
 
 
 if __name__ == "__main__":

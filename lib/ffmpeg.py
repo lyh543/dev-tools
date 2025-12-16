@@ -21,6 +21,7 @@ def ffmpeg(
     fps_change_mode: Literal["output", "vsync"] = "vsync",
     drop_duplicate_frames: bool = False,
     copy_mode: bool = False,
+    keep_metadata: bool = True,
 ):
     """
     run ffmpeg command
@@ -36,12 +37,14 @@ def ffmpeg(
     :param: fps_change_mode: "vsync" for "-vf 'fps=xxx' -vsync 2", or "output" for "-r xxx" option. See https://trac.ffmpeg.org/wiki/ChangingFrameRate'
     :param drop_duplicate_frames: whether use mpdecimate filter to drop duplicate frames
     :param copy_mode: True=copy video and audio stream, False=encode video and audio stream
+    :param keep_metadata: True=preserve original metadata (e.g. shooting time)
     """
     if copy_mode:
         command = FFmpeg.ffmpeg_copy_command(
             input=input,
             output=output,
             overwrite=overwrite,
+            keep_metadata=keep_metadata,
         )
     elif not output.endswith("mp3"):
         command = FFmpeg.ffmpeg_command(
@@ -55,6 +58,7 @@ def ffmpeg(
             fps=fps,
             fps_change_mode=fps_change_mode,
             drop_duplicate_frames=drop_duplicate_frames,
+            keep_metadata=keep_metadata,
         )
     else:
         command = FFmpeg.ffmpeg_audio_command(
@@ -62,6 +66,7 @@ def ffmpeg(
             output=output,
             overwrite=overwrite,
             audio_bitrate=audio_bitrate,
+            keep_metadata=keep_metadata,
         )
     print(">>>", command)
     try:
@@ -95,6 +100,7 @@ class FFmpeg:
         fps_change_mode: Literal["output", "vsync"] = "vsync",
         drop_duplicate_frames: bool = False,
         resolution: Optional[Tuple[int, int]] = None,
+        keep_metadata: bool = True,
     ) -> str:
         """
         generate command for ffmpeg
@@ -109,6 +115,7 @@ class FFmpeg:
         :param fps_change_mode: "vsync" for "-vf 'fps=xxx' -vsync 2", or "output" for "-r xxx" option. See https://trac.ffmpeg.org/wiki/ChangingFrameRate
         :param drop_duplicate_frames: whether use mpdecimate filter to drop duplicate frames
         :param resolution: [width, height] e.g. [-1, 720] for auto:720p
+        :param keep_metadata: True=preserve original metadata (e.g. shooting time)
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         [
@@ -119,6 +126,7 @@ class FFmpeg:
         input_option = cls._get_input_option(input)
         video_bitrate_option = cls._get_bitrate_option("video", video_bitrate)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
+        metadata_option = cls._get_metadata_option(keep_metadata)
         if fps_change_mode == "vsync":
             fps_option = ""
             fps_filter = cls._get_video_filter_fps(fps)
@@ -148,6 +156,7 @@ class FFmpeg:
                 video_encoder_option,
                 vsync_option,
                 fps_option,
+                metadata_option,
                 output_option,
             ]
         )
@@ -159,6 +168,7 @@ class FFmpeg:
         output: str,
         overwrite: OverwriteOptions = "ask",
         audio_bitrate: str = None,
+        keep_metadata: bool = True,
     ) -> str:
         """
         generate command for ffmpeg
@@ -167,10 +177,12 @@ class FFmpeg:
         :param output: output file path e.g. "output.mp4"
         :param overwrite: "always" "never" "ask"
         :param audio_bitrate: e.g. "128K" for 128Kbps
+        :param keep_metadata: True=preserve original metadata (e.g. shooting time)
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         input_option = cls._get_input_option(input)
         audio_bitrate_option = cls._get_bitrate_option("audio", audio_bitrate)
+        metadata_option = cls._get_metadata_option(keep_metadata)
         output_option = cls._get_output_option(output)
         return " ".join(
             [
@@ -179,6 +191,7 @@ class FFmpeg:
                 overwrite_option,
                 input_option,
                 audio_bitrate_option,
+                metadata_option,
                 output_option,
             ]
         )
@@ -191,6 +204,7 @@ class FFmpeg:
         overwrite: OverwriteOptions = "ask",
         video_encoder="copy",
         audio_encoder="copy",
+        keep_metadata: bool = True,
     ) -> str:
         """
         generate command for ffmpeg
@@ -200,10 +214,12 @@ class FFmpeg:
         :param overwrite: "always" "never" "ask"
         :param video_encode: e.g. "copy" or "hevc"
         :param audio_encode: e.g. "copy" or "aac"
+        :param keep_metadata: True=preserve original metadata (e.g. shooting time)
         """
         overwrite_option = cls._get_overwrite_option(overwrite)
         input_option = cls._get_input_option(input)
         video_encoder_option = cls._get_encoder_option(video_encoder, audio_encoder)
+        metadata_option = cls._get_metadata_option(keep_metadata)
         output_option = cls._get_output_option(output)
         return " ".join(
             [
@@ -212,6 +228,7 @@ class FFmpeg:
                 overwrite_option,
                 input_option,
                 video_encoder_option,
+                metadata_option,
                 output_option,
             ]
         )
@@ -305,6 +322,10 @@ class FFmpeg:
     @classmethod
     def _get_output_option(cls, output: str) -> str:
         return f'"{output}"'
+
+    @classmethod
+    def _get_metadata_option(cls, keep_metadata: bool) -> str:
+        return "-map_metadata 0" if keep_metadata else "-map_metadata -1"
 
     @classmethod
     def _get_bitrate_option(cls, type: str, bitrate: str = None) -> str:

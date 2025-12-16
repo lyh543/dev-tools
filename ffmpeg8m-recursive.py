@@ -3,12 +3,12 @@
 from concurrent.futures import ThreadPoolExecutor
 import click
 from __init__ import *
-from ffmpeg2m import ffmpeg2m
+from ffmpeg8m import ffmpeg8m
 from lib.ffmpeg_utils import get_compressed_output_path
 from lib.log import setup_logger
 
 
-def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
+def ffmpeg8m_recursive(path=".", use_gpu: bool = True):
     """
     :param path: directory path
     :param use_gpu: True=use GPU if exists, False=use CPU
@@ -34,7 +34,7 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
 
     def func(input_output):
         [input, output] = input_output
-        value = ffmpeg2m(input, output, use_gpu=use_gpu, overwrite="never")
+        value = ffmpeg8m(input, output, use_gpu=use_gpu, overwrite="never")
         # TODO: support Ctrl+C, after cleanup of other threads is handled correctly
         # if value in [255, 65280]:
         #     print("exiting")
@@ -53,7 +53,7 @@ def ffmpeg2m_recursive(path=".", use_gpu: bool = True):
 @click.argument("path", default=".")
 def main(path: str, use_gpu: bool = True):
     setup_logger()
-    ffmpeg2m_recursive(path, use_gpu=use_gpu)
+    ffmpeg8m_recursive(path, use_gpu=use_gpu)
 
 
 if __name__ == "__main__":
